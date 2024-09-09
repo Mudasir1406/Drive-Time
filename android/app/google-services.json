@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1048277062240",
+    "project_id": "drive-time-6e9f8",
+    "storage_bucket": "drive-time-6e9f8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1048277062240:android:5b66cb6ac6ba7077896905",
+        "android_client_info": {
+          "package_name": "com.drivetimeapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1048277062240-m68tapc9n3r1c1nmsu1q29h92ppap3on.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.drivetimeapp",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "1048277062240-ke4fg7dk77mn7fabtgkvml6cnnv238dv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBznYmvQbtOfsQFRlg6jHA2kLGeQVoW3mY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1048277062240-ke4fg7dk77mn7fabtgkvml6cnnv238dv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
