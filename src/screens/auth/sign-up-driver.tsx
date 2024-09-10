@@ -25,7 +25,7 @@ const SignUpDriver = () => {
             setvehicleImages((prev) => (Array.isArray(prev) ? [...prev, url] : [url]));
         } else if (currentImageType === 'vehicleDocuments') {
             setvehicleDocuments((prev) => (Array.isArray(prev) ? [...prev, url] : [url]));
-        } else if (currentImageType === 'license') {
+        } else if (currentImageType === 'lisence') {
             setLisence((prev) => (Array.isArray(prev) ? [...prev, url] : [url]));
         } else if (currentImageType === 'cnic') {
             setCnic((prev) => (Array.isArray(prev) ? [...prev, url] : [url]));
