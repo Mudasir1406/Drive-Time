@@ -23,7 +23,7 @@ const LoginTypes: React.FC<IProps> = ({navigation}) => {
       />
       <Box sx={styles.boxBtn}>
         <CustomButton
-          text={'Click to start as a driver'}
+          text={'Click to start as a Driver'}
           handlePress={() => {
             dispatch(userActions.setUser({type: 'driver'}));
             navigation.navigate('SignUpDriver');
@@ -32,7 +32,7 @@ const LoginTypes: React.FC<IProps> = ({navigation}) => {
       </Box>
       <Box sx={styles.boxBtn}>
         <CustomButton
-          text={' Click to start as a user'}
+          text={' Click to start as a User'}
           handlePress={() => {
             dispatch(userActions.setUser({type: 'user'}));
             navigation.navigate('SignUpUser');

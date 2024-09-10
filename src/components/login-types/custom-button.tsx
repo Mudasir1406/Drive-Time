@@ -10,7 +10,7 @@ const CustomButton: React.FC<IProps> = ({text, handlePress}) => {
   return (
     <Box>
       <Button onPress={handlePress} sx={styles.btn}>
-        <ButtonText sx={{textAlign: 'center', color: colors.black}}>
+        <ButtonText sx={{textAlign: 'center', color: colors.white}}>
           {text}
         </ButtonText>
       </Button>
@@ -23,9 +23,11 @@ export default CustomButton;
 const styles = StyleSheet.create({
   btn: {
     borderColor: colors.black,
+    borderRadius: 5,
     borderWidth: 1,
     borderStyle: 'solid',
-    padding: 2,
-    backgroundColor: 'transparent',
+
+    backgroundColor: 'black',
+    width: '100%',
   },
 });
