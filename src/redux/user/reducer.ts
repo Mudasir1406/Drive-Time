@@ -14,6 +14,7 @@ export const setUser = (state: stateType, action: actionType) => {
     customerId,
     phoneno,
     userCard,
+    type,
   } = action.payload;
 
   state.accessToken =
@@ -27,4 +28,5 @@ export const setUser = (state: stateType, action: actionType) => {
   state.customerId = customerId !== undefined ? customerId : state.customerId;
   state.phoneno = phoneno !== undefined ? phoneno : state.phoneno;
   state.userCard = userCard !== undefined ? userCard : state.userCard;
+  state.type = type ? type : state.type;
 };

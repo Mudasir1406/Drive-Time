@@ -7,14 +7,15 @@ export type CardType = {
   cardName: string;
 };
 export type UserSliceType = {
-  accessToken: string;
-  customerEmail: string;
-  customerName: string;
-  isLoggedIn: boolean;
-  drawerOpen: boolean;
-  customerId: string;
-  phoneno: string;
-  userCard: CardType | undefined;
+  accessToken?: string;
+  customerEmail?: string;
+  customerName?: string;
+  isLoggedIn?: boolean;
+  drawerOpen?: boolean;
+  customerId?: string;
+  phoneno?: string;
+  userCard?: CardType | undefined;
+  type?: string;
 };
 
 export const userSliceIntialState: UserSliceType = {
