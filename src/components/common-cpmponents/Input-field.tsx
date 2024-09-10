@@ -2,10 +2,15 @@ import {StyleSheet, Text, View, TextInput} from 'react-native';
 import React from 'react';
 import {useField} from 'formik';
 import {colors} from '../../constant';
+import {TextInputProps} from 'react-native';
 
-const CustomInput = ({label, name, ...props}) => {
+interface CustomInputProps extends TextInputProps {
+  label?: string;
+  name: string;
+}
+
+const CustomInput: React.FC<CustomInputProps> = ({label, name, ...props}) => {
   const [field, meta] = useField(name);
-
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}

@@ -127,7 +127,7 @@ const UserSignUp = () => {
             </Box>
 
             <Box sx={styles.submitButtonContainer}>
-              <CustomButton text="Sign up" />
+              <CustomButton text="Sign up" handlePress={handleSubmit} />
             </Box>
           </Box>
         );
