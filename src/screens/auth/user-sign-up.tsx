@@ -49,7 +49,7 @@ const UserSignUp = () => {
       }}
       validationSchema={signupValidationSchema}
       onSubmit={values => {
-        signup(values);
+        signup({...values, userType: user.type});
       }}>
       {({handleChange, handleBlur, handleSubmit, values, setFieldValue}) => {
         useEffect(() => {
