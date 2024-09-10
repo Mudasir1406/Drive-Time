@@ -9,7 +9,7 @@ import {
 } from '@gluestack-ui/themed';
 import {HStack} from '@gluestack-ui/themed';
 import {Formik} from 'formik';
-import * as Yup from 'yup';
+
 import CustomInput from '../../components/common-cpmponents/Input-field';
 import {
   Select,
@@ -26,20 +26,14 @@ import {
 import {Icon} from '@gluestack-ui/themed';
 import CustomButton from '../../components/login-types/custom-button';
 import {colors} from '../../constant';
-
-const validationSchema = Yup.object().shape({
-  username: Yup.string().required('Username is required'),
-  firstname: Yup.string().required('First name is required'),
-  lastname: Yup.string().required('Last name is required'),
-  phone: Yup.string().required('Phone number is required'),
-  dob: Yup.date().required('Date of Birth is required'),
-  gender: Yup.string().required('Gender is required'),
-  email: Yup.string()
-    .email('Invalid email address')
-    .required('Email is required'),
-});
+import {useAuth} from '../../hooks/useAuth';
+import {signupValidationSchema} from '../../Utils/validation-schemas';
+import {useSelector} from 'react-redux';
 
 const UserSignUp = () => {
+  const {signup} = useAuth();
+  const user = useSelector(data => data.user);
+  console.log(user, 'user');
   return (
     <Formik
       initialValues={{
@@ -49,14 +43,16 @@ const UserSignUp = () => {
         phone: '',
         dob: '',
         gender: '',
+        email: '',
+        password: '',
       }}
-      validationSchema={validationSchema}
+      validationSchema={signupValidationSchema}
       onSubmit={values => {
-        console.log('Form Submitted:', values);
+        signup(values);
       }}>
       {({handleChange, handleBlur, handleSubmit, values, setFieldValue}) => {
         useEffect(() => {
-          console.log('Form Values:', values);
+          console.log('Form Values:', {...values, userType: user.type});
         }, [values]);
 
         return (
@@ -79,6 +75,15 @@ const UserSignUp = () => {
                 onChangeText={handleChange('email')}
                 onBlur={handleBlur('email')}
                 value={values.email}
+              />
+              <CustomInput
+                label="Password"
+                name="password"
+                placeholder="Enter Password"
+                secureTextEntry={true} // Ensure password is hidden
+                onChangeText={handleChange('password')}
+                onBlur={handleBlur('password')}
+                value={values.password}
               />
               <HStack space="sm" reversed={false}>
                 <Box sx={styles.inputBox}>
@@ -122,15 +127,12 @@ const UserSignUp = () => {
               <Box sx={styles.genderContainer}>
                 <Text sx={styles.label}>Gender</Text>
                 <Select
-                  value={values.gender}
+                  selectedValue={values.gender}
                   onValueChange={itemValue =>
                     setFieldValue('gender', itemValue)
                   }>
                   <SelectTrigger variant="outline" size="md">
                     <SelectInput placeholder="Select Gender" />
-                    <SelectIcon mr="$3">
-                      <Icon as={ChevronDownIcon} />
-                    </SelectIcon>
                   </SelectTrigger>
                   <SelectPortal>
                     <SelectBackdrop />
