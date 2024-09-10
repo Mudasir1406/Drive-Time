@@ -1,5 +1,5 @@
-import {StyleSheet, View} from 'react-native';
-import React, {useEffect} from 'react';
+import { StyleSheet, View } from 'react-native';
+import React, { useEffect } from 'react';
 import {
   Box,
   Button,
@@ -7,8 +7,8 @@ import {
   ScrollView,
   Text,
 } from '@gluestack-ui/themed';
-import {HStack} from '@gluestack-ui/themed';
-import {Formik} from 'formik';
+import { HStack } from '@gluestack-ui/themed';
+import { Formik } from 'formik';
 import * as Yup from 'yup';
 import CustomInput from '../../components/common-cpmponents/Input-field';
 import {
@@ -23,9 +23,9 @@ import {
   SelectDragIndicator,
   SelectDragIndicatorWrapper,
 } from '@gluestack-ui/themed';
-import {Icon} from '@gluestack-ui/themed';
+import { Icon } from '@gluestack-ui/themed';
 import CustomButton from '../../components/login-types/custom-button';
-import {colors} from '../../constant';
+import { colors } from '../../constant';
 
 const validationSchema = Yup.object().shape({
   username: Yup.string().required('Username is required'),
@@ -49,12 +49,13 @@ const UserSignUp = () => {
         phone: '',
         dob: '',
         gender: '',
+        email: ''
       }}
       validationSchema={validationSchema}
       onSubmit={values => {
         console.log('Form Submitted:', values);
       }}>
-      {({handleChange, handleBlur, handleSubmit, values, setFieldValue}) => {
+      {({ handleChange, handleBlur, handleSubmit, values, setFieldValue }) => {
         useEffect(() => {
           console.log('Form Values:', values);
         }, [values]);
@@ -122,14 +123,13 @@ const UserSignUp = () => {
               <Box sx={styles.genderContainer}>
                 <Text sx={styles.label}>Gender</Text>
                 <Select
-                  value={values.gender}
+                  selectedValue={values.gender}
                   onValueChange={itemValue =>
                     setFieldValue('gender', itemValue)
                   }>
                   <SelectTrigger variant="outline" size="md">
                     <SelectInput placeholder="Select Gender" />
-                    <SelectIcon mr="$3">
-                      <Icon as={ChevronDownIcon} />
+                    <SelectIcon mr="$3" >
                     </SelectIcon>
                   </SelectTrigger>
                   <SelectPortal>
