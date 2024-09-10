@@ -1,36 +1,66 @@
-import {StyleSheet} from 'react-native';
-import React from 'react';
+import {Animated, Dimensions, Easing, StyleSheet} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
 import {Box, Button, ButtonText, Text} from '@gluestack-ui/themed';
 import {GuideContent} from '../../components';
 import {colors} from '../../constant';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamList} from '../../types/types';
-
-type guideScreenNavigationProps = StackNavigationProp<
-  RootStackParamList,
-  'guide'
->;
+import {guideScreenNavigationProps} from '../../types/types';
+import {contentApp} from '../../constant';
 
 type props = {
   navigation: guideScreenNavigationProps;
 };
 
+const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const Guide: React.FC<props> = ({navigation}) => {
-  const content = {
-    heading: 'Navigation',
-    tagLine: "Don't worry about getting lost",
+  const [guideScreen, setGuideScreen] = useState('first');
+  const [content, setContent] = useState(contentApp.contents);
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const slideIn = () => {
+    // Slide animation
+    slideAnim.setValue(SCREEN_WIDTH); // Start from off-screen
+    Animated.timing(slideAnim, {
+      toValue: 0, // Slide in to the center of the screen
+      duration: 300, // Animation duration in ms
+      easing: Easing.ease, // Easing function
+      useNativeDriver: true, // Use native driver for performance
+    }).start();
   };
-
   const handleNavigate = (name: string) => {
-    if (name === 'skip') {
+    if (name === 'skip' || name === 'done') {
       navigation.navigate('LoginType');
-    } else {
-      navigation.navigate('guideSecond');
     }
   };
+  const handleNext = () => {
+    if (guideScreen === 'first') {
+      setGuideScreen('second');
+    } else if (guideScreen === 'second') {
+      setGuideScreen('third');
+    }
+  };
+  useEffect(() => {
+    if (guideScreen === 'first') {
+      setContent(contentApp.contents);
+    }
+    if (guideScreen === 'second') {
+      setContent(contentApp.contentSecond);
+    }
+    if (guideScreen === 'third') {
+      setContent(contentApp.contentThird);
+    }
+  }, [guideScreen]);
+  useEffect(() => {
+    // Slide in content when guideScreen changes
+    slideIn();
+  }, [guideScreen]);
   return (
     <Box sx={styles.main}>
-      <GuideContent heading={content.heading} tagLine={content.tagLine} />
+      <Animated.View
+        style={[
+          styles.contentContainer,
+          {transform: [{translateX: slideAnim}]},
+        ]}>
+        <GuideContent heading={content.heading} tagLine={content.tagLine} />
+      </Animated.View>
       <Box sx={styles.btnBox}>
         <Button
           size="md"
@@ -39,9 +69,13 @@ const Guide: React.FC<props> = ({navigation}) => {
           isFocusVisible={true}
           sx={styles.btn}
           onPress={() => {
-            handleNavigate('skip');
+            guideScreen !== 'third'
+              ? handleNavigate('skip')
+              : setGuideScreen('second');
           }}>
-          <ButtonText sx={styles.btnText}>SKIP </ButtonText>
+          <ButtonText sx={styles.btnText}>
+            {guideScreen !== 'third' ? 'SKIP' : 'BACK'}{' '}
+          </ButtonText>
         </Button>
         <Button
           size="md"
@@ -50,9 +84,12 @@ const Guide: React.FC<props> = ({navigation}) => {
           isFocusVisible={false}
           sx={styles.btn}
           onPress={() => {
-            handleNavigate('next');
+            guideScreen !== 'third' ? handleNext() : handleNavigate('done');
           }}>
-          <ButtonText sx={styles.btnText}>NEXT </ButtonText>
+          <ButtonText sx={styles.btnText}>
+            {' '}
+            {guideScreen !== 'third' ? 'NEXT' : 'Done'}
+          </ButtonText>
         </Button>
       </Box>
     </Box>
@@ -67,6 +104,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
+  },
+  contentContainer: {
+    width: '100%',
+    alignItems: 'center',
   },
   btnBox: {
     position: 'absolute',

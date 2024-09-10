@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/types';
-import { Guide, GuideSecond, Login, LoginTypes, SignUpDriver, UserSignUp } from '../../screens/auth';
+import { Guide, Login, LoginTypes, SignUpDriver, UserSignUp } from '../../screens/auth';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const AuthNavigation = () => {
@@ -23,7 +23,7 @@ const AuthNavigation = () => {
         animationDuration: 300,
       }}>
       <RootStack.Screen name="guide" component={Guide} />
-      <RootStack.Screen name="guideSecond" component={GuideSecond} />
+
       <RootStack.Screen name="LoginType" component={LoginTypes} />
       <RootStack.Screen name="Login" component={Login} />
       <RootStack.Screen name="SignUpUser" component={UserSignUp} />

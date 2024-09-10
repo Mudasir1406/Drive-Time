@@ -6,10 +6,13 @@ export type RootStackParamList = {
   SignUpDriver: undefined;
   LoginType: undefined;
   guide: undefined;
-  guideSecond: undefined;
 };
 
 export type LoginTypeNavigation = StackNavigationProp<
   RootStackParamList,
   'LoginType'
+>;
+export type guideScreenNavigationProps = StackNavigationProp<
+  RootStackParamList,
+  'guide'
 >;
