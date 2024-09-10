@@ -1,16 +1,16 @@
-import {StyleSheet, Text, View} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
-import {Box, Button, ButtonText} from '@gluestack-ui/themed';
-import {colors} from '../../constant';
+import { Box, Button, ButtonText } from '@gluestack-ui/themed';
+import { colors } from '../../constant';
 type IProps = {
   text: string;
   handlePress: () => void;
 };
-const CustomButton: React.FC<IProps> = ({text, handlePress}) => {
+const CustomButton: React.FC<IProps> = ({ text, handlePress }) => {
   return (
     <Box>
       <Button onPress={handlePress} sx={styles.btn}>
-        <ButtonText sx={{textAlign: 'center', color: colors.white}}>
+        <ButtonText sx={{ textAlign: 'center', color: colors.white }}>
           {text}
         </ButtonText>
       </Button>
