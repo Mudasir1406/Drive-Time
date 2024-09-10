@@ -1,40 +1,40 @@
-import {StyleSheet, Text, View} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
-import {Box, Image} from '@gluestack-ui/themed';
-import {images} from '../../constant';
+import { Box, Image } from '@gluestack-ui/themed';
+import { images } from '../../constant';
 import CustomButton from '../../components/login-types/custom-button';
-import {useDispatch} from 'react-redux';
-import {setUser} from '../../redux/user/reducer';
-import {LoginTypeNavigation} from '../../types/types';
-import {StoreDispatch} from '../../redux/reduxStore';
-import {userActions} from '../../redux/user/slice';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../redux/user/reducer';
+import { LoginTypeNavigation } from '../../types/types';
+import { StoreDispatch } from '../../redux/reduxStore';
+import { userActions } from '../../redux/user/slice';
 type IProps = {
   navigation: LoginTypeNavigation;
 };
 
-const LoginTypes: React.FC<IProps> = ({navigation}) => {
+const LoginTypes: React.FC<IProps> = ({ navigation }) => {
   const dispatch = useDispatch<StoreDispatch>();
   return (
     <Box sx={styles.container}>
       <Image
-        source={{uri: images.onboardImage}} // Image from URI
+        source={{ uri: images.onboardImage }} // Image from URI
         style={styles.image}
         alt="oops"
       />
       <Box sx={styles.boxBtn}>
         <CustomButton
-          text={'Click to start as a driver'}
+          text={'Start as a Driver'}
           handlePress={() => {
-            dispatch(userActions.setUser({type: 'driver'}));
+            dispatch(userActions.setUser({ type: 'driver' }));
             navigation.navigate('SignUpDriver');
           }}
         />
       </Box>
       <Box sx={styles.boxBtn}>
         <CustomButton
-          text={' Click to start as a user'}
+          text={'Start as a User'}
           handlePress={() => {
-            dispatch(userActions.setUser({type: 'user'}));
+            dispatch(userActions.setUser({ type: 'user' }));
             navigation.navigate('SignUpUser');
           }}
         />
