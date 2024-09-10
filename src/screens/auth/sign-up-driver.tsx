@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native'
 import React, { useState } from 'react'
-import { Box, ScrollView } from '@gluestack-ui/themed'
+import { Box, Image, ScrollView } from '@gluestack-ui/themed'
 import { Text } from '@gluestack-ui/themed'
 import { colors } from '../../constant'
 import UploadImage from '../../components/signup-driver/UploadImage'
@@ -9,15 +9,29 @@ import ImagePicker from 'react-native-image-crop-picker';
 import { Toast } from 'react-native-toast-notifications'
 import { firebase } from '@react-native-firebase/auth'
 import { uploadImage } from '../../services/storage-service/StorageService'
+import CameraModal from '../../components/common-cpmponents/Camera-modal'
 
 const SignUpDriver = () => {
-    const [vehicleImages, setvehicleImages] = useState([]);
-    const [vehicleDocuments, setvehicleDocuments] = useState([]);
-    const [license, setLisence] = useState([]);
-    const [cnic, setCnic] = useState([]);
+    const [vehicleImages, setvehicleImages] = useState<string[]>([]);
+    const [vehicleDocuments, setvehicleDocuments] = useState<string[]>([]);
+    const [license, setLisence] = useState<string[]>([]);
+    const [cnic, setCnic] = useState<string[]>([]);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [currentImageType, setcurrentImageType] = useState<string>();
+    const setUploadImage = async (url: string) => {
+        console.log(url, 'setting');
 
+        if (currentImageType === 'vehiclePicture') {
+            setvehicleImages((prev) => (Array.isArray(prev) ? [...prev, url] : [url]));
+        } else if (currentImageType === 'vehicleDocuments') {
+            setvehicleDocuments((prev) => (Array.isArray(prev) ? [...prev, url] : [url]));
+        } else if (currentImageType === 'license') {
+            setLisence((prev) => (Array.isArray(prev) ? [...prev, url] : [url]));
+        } else if (currentImageType === 'cnic') {
+            setCnic((prev) => (Array.isArray(prev) ? [...prev, url] : [url]));
+        }
+    };
     const openCamera = async () => {
-        let pic: string | undefined = '';
         const test = await requestCameraPermission();
         console.log(test);
 
@@ -30,8 +44,11 @@ const SignUpDriver = () => {
 
                 console.log(image);
                 uploadImage(image.path).then((url) => {
-                    console.log(url);
-                    pic = url;
+                    console.log(url, 'url');
+                    if (url) {
+
+                        setUploadImage(url)
+                    }
                     Toast.show('Picture Updated', {
                         type: 'success',
                     });
@@ -39,69 +56,80 @@ const SignUpDriver = () => {
             });
 
         }
-        return pic;
+        setModalVisible(false);
     };
     const openGallery = () => {
-        let pic: string | undefined = '';
         ImagePicker.openPicker({
             width: 300,
             height: 400,
             cropping: true,
-        }).then(image => {
-            console.log(image);
-            uploadImage(image.path).then((url) => {
-                console.log(url);
-                pic = url;
-                Toast.show('Picture Updated', {
-                    type: 'success',
+            multiple: true,
+        }).then(images => {
+            // If multiple images are selected
+            console.log(images, 'multiple images');
+            images.forEach((image: any) => {
+                uploadImage(image.path).then((url) => {
+                    if (url) {
+                        setUploadImage(url); // Upload each image
+                    }
                 });
+            });
+            Toast.show('Multiple pictures updated', {
+                type: 'success',
+            });
 
-            })
         });
-        return pic;
+        setModalVisible(false);
     };
-
-    const handleImageUpload = (type: string) => {
-        let url = openCamera();
-        if (type === 'vehiclePicture') {
-            setvehicleImages((prev) => (
-                {
-                    ...prev,
-                    url
-                }
-            ))
-        } else if (type === 'vehicleDocuments') {
-            setvehicleDocuments((prev) => (
-                {
-                    ...prev,
-                    url
-                }
-            ))
-        } else if (type === 'lisence') {
-            setLisence((prev) => (
-                {
-                    ...prev,
-                    url
-                }
-            ))
-        } else if (type === 'cnic') {
-            setCnic((prev) => (
-                {
-                    ...prev,
-                    url
-                }
-            ))
-        }
+    const openModal = (type: string) => {
+        setcurrentImageType(type)
+        setModalVisible(true);
     }
+
     return (
         <ScrollView>
             <Box sx={styles.form} >
                 <Text sx={styles.heading} >Driver's Information</Text>
-                <UploadImage heading='Upload Vehicle Pictures' onPress={() => { handleImageUpload('vehiclePicture') }} />
-                <UploadImage heading='Upload Vehicle Documents' onPress={() => { handleImageUpload('vehicleDocuments') }} />
-                <UploadImage heading='Upload License (front/back)' onPress={() => { handleImageUpload('lisence') }} />
-                <UploadImage heading='Upload CNIC (front/back)' onPress={() => { handleImageUpload('cnic') }} />
+                <UploadImage heading='Upload Vehicle Pictures' onPress={() => { openModal('vehiclePicture') }} />
+                {vehicleImages && vehicleImages?.length > 0 && <Box sx={styles.imageWrapper} >
+                    {vehicleImages.map((data, index) => {
+                        return (
+                            <Image alt='oops' source={{ uri: data }} key={index} sx={{ width: 100, height: 100, borderRadius: 10, margin: 10 }} />
+                        )
+                    })}
+                </Box>}
+                <UploadImage heading='Upload Vehicle Documents' onPress={() => { openModal('vehicleDocuments') }} />
+                {vehicleDocuments && vehicleDocuments?.length > 0 && <Box sx={styles.imageWrapper} >
+                    {vehicleDocuments.map((data, index) => {
+                        return (
+                            <Image alt='oops' source={{ uri: data }} key={index} sx={{ width: 100, height: 100, borderRadius: 10 }} />
+                        )
+                    })}
+                </Box>}
+                <UploadImage heading='Upload License (front/back)' onPress={() => { openModal('lisence') }} />
+                {license && license?.length > 0 && <Box sx={styles.imageWrapper} >
+                    {license.map((data, index) => {
+                        return (
+                            <Image alt='oops' source={{ uri: data }} key={index} sx={{ width: 100, height: 100, borderRadius: 10, margin: 10 }} />
+                        )
+                    })}
+                </Box>}
+                <UploadImage heading='Upload CNIC (front/back)' onPress={() => { openModal('cnic') }} />
+                {cnic && cnic?.length > 0 && <Box sx={styles.imageWrapper} >
+                    {cnic.map((data, index) => {
+                        return (
+                            <Image alt='oops' source={{ uri: data }} key={index} sx={{ width: 100, height: 100, borderRadius: 10, margin: 10 }} />
+                        )
+                    })}
+                </Box>}
+                <CameraModal
+                    openCamera={() => openCamera()}
+                    openGallery={() => openGallery()}
+                    modalVisible={modalVisible}
+                    setModalVisible={setModalVisible}
+                />
             </Box>
+
         </ScrollView>
     )
 }
@@ -122,5 +150,8 @@ const styles = StyleSheet.create({
         fontWeight: "600"
 
     },
+    imageWrapper: {
+        margin: 10, display: "flex", flexDirection: "row", gap: 5, width: "100%"
+    }
 
 })

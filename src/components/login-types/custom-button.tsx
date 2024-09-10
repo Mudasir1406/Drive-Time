@@ -22,13 +22,12 @@ export default CustomButton;
 
 const styles = StyleSheet.create({
   btn: {
-    // borderColor: colors.black,
-    // borderWidth: 1,
+    borderColor: colors.black,
+    borderRadius: 5,
+    borderWidth: 1,
     borderStyle: 'solid',
-    padding: 2,
-    backgroundColor: '#4A5B61',
-    elevation: 4,
 
-    marginTop: -10
+    backgroundColor: 'black',
+    width: '100%',
   },
 });
