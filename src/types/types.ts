@@ -4,4 +4,5 @@ export type RootStackParamList = {
   SignUpDriver: undefined;
   LoginType: undefined;
   guide: undefined;
+  guideSecond: undefined;
 };
