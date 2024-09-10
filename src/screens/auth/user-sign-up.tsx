@@ -1,6 +1,12 @@
 import {StyleSheet, View} from 'react-native';
 import React, {useEffect} from 'react';
-import {Box, Button, ChevronDownIcon, Text} from '@gluestack-ui/themed';
+import {
+  Box,
+  Button,
+  ChevronDownIcon,
+  ScrollView,
+  Text,
+} from '@gluestack-ui/themed';
 import {HStack} from '@gluestack-ui/themed';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
@@ -28,6 +34,9 @@ const validationSchema = Yup.object().shape({
   phone: Yup.string().required('Phone number is required'),
   dob: Yup.date().required('Date of Birth is required'),
   gender: Yup.string().required('Gender is required'),
+  email: Yup.string()
+    .email('Invalid email address')
+    .required('Email is required'),
 });
 
 const UserSignUp = () => {
@@ -39,7 +48,7 @@ const UserSignUp = () => {
         lastname: '',
         phone: '',
         dob: '',
-        gender: 'male',
+        gender: '',
       }}
       validationSchema={validationSchema}
       onSubmit={values => {
@@ -51,85 +60,97 @@ const UserSignUp = () => {
         }, [values]);
 
         return (
-          <Box sx={styles.main}>
-            <Text sx={styles.heading}>User Sign Up</Text>
+          <ScrollView>
+            <Box sx={styles.main}>
+              <Text sx={styles.heading}>User Sign Up</Text>
 
-            <CustomInput
-              label="Username"
-              name="username"
-              placeholder="Enter Username"
-              onChangeText={handleChange('username')}
-              onBlur={handleBlur('username')}
-              value={values.username}
-            />
-            <HStack space="sm" reversed={false}>
-              <Box sx={styles.inputBox}>
-                <CustomInput
-                  label="First Name"
-                  name="firstname"
-                  placeholder="Enter First Name"
-                  onChangeText={handleChange('firstname')}
-                  onBlur={handleBlur('firstname')}
-                  value={values.firstname}
-                />
+              <CustomInput
+                label="Username"
+                name="username"
+                placeholder="Enter Username"
+                onChangeText={handleChange('username')}
+                onBlur={handleBlur('username')}
+                value={values.username}
+              />
+              <CustomInput
+                label="Email"
+                name="email"
+                placeholder="Enter Email"
+                onChangeText={handleChange('email')}
+                onBlur={handleBlur('email')}
+                value={values.email}
+              />
+              <HStack space="sm" reversed={false}>
+                <Box sx={styles.inputBox}>
+                  <CustomInput
+                    label="First Name"
+                    name="firstname"
+                    placeholder="Enter First Name"
+                    onChangeText={handleChange('firstname')}
+                    onBlur={handleBlur('firstname')}
+                    value={values.firstname}
+                  />
+                </Box>
+                <Box sx={styles.inputBox}>
+                  <CustomInput
+                    label="Last Name"
+                    name="lastname"
+                    placeholder="Enter Last Name"
+                    onChangeText={handleChange('lastname')}
+                    onBlur={handleBlur('lastname')}
+                    value={values.lastname}
+                  />
+                </Box>
+              </HStack>
+              <CustomInput
+                label="Phone"
+                name="phone"
+                placeholder="Enter Phone Number"
+                onChangeText={handleChange('phone')}
+                onBlur={handleBlur('phone')}
+                value={values.phone}
+              />
+              <CustomInput
+                label="Date of Birth"
+                name="dob"
+                placeholder="YYYY-MM-DD"
+                onChangeText={handleChange('dob')}
+                onBlur={handleBlur('dob')}
+                value={values.dob}
+              />
+
+              <Box sx={styles.genderContainer}>
+                <Text sx={styles.label}>Gender</Text>
+                <Select
+                  value={values.gender}
+                  onValueChange={itemValue =>
+                    setFieldValue('gender', itemValue)
+                  }>
+                  <SelectTrigger variant="outline" size="md">
+                    <SelectInput placeholder="Select Gender" />
+                    <SelectIcon mr="$3">
+                      <Icon as={ChevronDownIcon} />
+                    </SelectIcon>
+                  </SelectTrigger>
+                  <SelectPortal>
+                    <SelectBackdrop />
+                    <SelectContent>
+                      <SelectDragIndicatorWrapper>
+                        <SelectDragIndicator />
+                      </SelectDragIndicatorWrapper>
+                      <SelectItem label="Male" value="male" />
+                      <SelectItem label="Female" value="female" />
+                      <SelectItem label="Other" value="other" />
+                    </SelectContent>
+                  </SelectPortal>
+                </Select>
               </Box>
-              <Box sx={styles.inputBox}>
-                <CustomInput
-                  label="Last Name"
-                  name="lastname"
-                  placeholder="Enter Last Name"
-                  onChangeText={handleChange('lastname')}
-                  onBlur={handleBlur('lastname')}
-                  value={values.lastname}
-                />
+
+              <Box sx={styles.submitButtonContainer}>
+                <CustomButton text="Sign up" handlePress={handleSubmit} />
               </Box>
-            </HStack>
-            <CustomInput
-              label="Phone"
-              name="phone"
-              placeholder="Enter Phone Number"
-              onChangeText={handleChange('phone')}
-              onBlur={handleBlur('phone')}
-              value={values.phone}
-            />
-            <CustomInput
-              label="Date of Birth"
-              name="dob"
-              placeholder="YYYY-MM-DD"
-              onChangeText={handleChange('dob')}
-              onBlur={handleBlur('dob')}
-              value={values.dob}
-            />
-
-            <Box sx={styles.genderContainer}>
-              <Text sx={styles.label}>Gender</Text>
-              <Select
-                value={values.gender}
-                onValueChange={itemValue => setFieldValue('gender', itemValue)}>
-                <SelectTrigger variant="outline" size="md">
-                  <SelectInput placeholder="Select Gender" />
-                  <SelectIcon mr="$3">
-                    <Icon as={ChevronDownIcon} />
-                  </SelectIcon>
-                </SelectTrigger>
-                <SelectPortal>
-                  <SelectBackdrop />
-                  <SelectContent>
-                    <SelectDragIndicatorWrapper>
-                      <SelectDragIndicator />
-                    </SelectDragIndicatorWrapper>
-                    <SelectItem label="Male" value="male" />
-                    <SelectItem label="Female" value="female" />
-                    <SelectItem label="Other" value="other" />
-                  </SelectContent>
-                </SelectPortal>
-              </Select>
             </Box>
-
-            <Box sx={styles.submitButtonContainer}>
-              <CustomButton text="Sign up" handlePress={handleSubmit} />
-            </Box>
-          </Box>
+          </ScrollView>
         );
       }}
     </Formik>
