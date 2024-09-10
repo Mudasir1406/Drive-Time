@@ -37,6 +37,7 @@ type PersonalData = {
     VehicleNo: string;
     VehicleType: string;
     registrationNo: string;
+    password: string;
 };
 
 type Iprops = {
@@ -61,6 +62,9 @@ const validationSchema = Yup.object().shape({
     VehicleNo: Yup.string().required('Vehicle Number is required'),
     VehicleType: Yup.string().required('Vehicle Type is required'),
     registrationNo: Yup.string().required('Registration No is required'),
+    password: Yup.string()
+        .min(6, 'Password must be at least 6 characters')
+        .required('Password is required'),
 });
 
 const DriverSignUpForm: React.FC<Iprops> = ({ setpersonalInfo, setPersonalData, PersonalData }) => {
@@ -79,6 +83,7 @@ const DriverSignUpForm: React.FC<Iprops> = ({ setpersonalInfo, setPersonalData, 
                 VehicleNo: PersonalData.VehicleNo || '',
                 VehicleType: PersonalData.VehicleType || '',
                 registrationNo: PersonalData.registrationNo || '',
+                password: PersonalData.password || '',
 
             }}
             validationSchema={validationSchema}
@@ -135,6 +140,14 @@ const DriverSignUpForm: React.FC<Iprops> = ({ setpersonalInfo, setPersonalData, 
                                     />
                                 </Box>
                             </HStack>
+                            <CustomInput
+                                label="Password"
+                                name="password"
+                                placeholder="Enter Password"
+                                onChangeText={handleChange('password')}
+                                onBlur={handleBlur('password')}
+                                value={values.password}
+                            />
                             <CustomInput
                                 label="Phone"
                                 name="phone"

@@ -11,8 +11,11 @@ import { uploadImage } from '../../services/storage-service/StorageService'
 import CameraModal from '../../components/common-cpmponents/Camera-modal'
 import DriverSignUpForm from '../../components/signup-driver/DriverSignUpForm'
 import Ionicons from "react-native-vector-icons/Ionicons"
+import { useAuth } from '../../hooks/useAuth'
+import CustomButton from '../../components/login-types/custom-button'
 
 const SignUpDriver: React.FC = () => {
+    const { signup } = useAuth();
     const [modalVisible, setModalVisible] = useState(false);
     const [personalInfo, setpersonalInfo] = useState(false);
     const [vehicleImages, setvehicleImages] = useState<string[]>([]);
@@ -33,6 +36,7 @@ const SignUpDriver: React.FC = () => {
         VehicleNo: '',
         VehicleType: '',
         registrationNo: '',
+        password: '',
     });
 
 
@@ -103,6 +107,9 @@ const SignUpDriver: React.FC = () => {
         setModalVisible(true);
     }
 
+    const SubmitDriverSignUp = () => {
+        signup({ ...PersonalData, userType: 'driver', vehicleImages: vehicleImages, vehicleDocuments: vehicleDocuments, license: license, cnic: cnic });
+    }
 
     return (
         <ScrollView>
@@ -146,6 +153,9 @@ const SignUpDriver: React.FC = () => {
                         )
                     })}
                 </Box>}
+                <Box sx={styles.submitButtonContainer}>
+                    <CustomButton text="Sign up" handlePress={SubmitDriverSignUp} />
+                </Box>
                 <CameraModal
                     openCamera={() => openCamera()}
                     openGallery={() => openGallery()}
@@ -176,6 +186,11 @@ const styles = StyleSheet.create({
     },
     imageWrapper: {
         margin: 10, display: "flex", flexDirection: "row", gap: 5, width: "100%"
-    }
+    },
+    submitButtonContainer: {
+        marginTop: 20,
+
+        width: '100%',
+    },
 
 })

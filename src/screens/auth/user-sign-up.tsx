@@ -29,10 +29,11 @@ import { colors } from '../../constant';
 import { useAuth } from '../../hooks/useAuth';
 import { signupValidationSchema } from '../../Utils/validation-schemas';
 import { useSelector } from 'react-redux';
+import { StoreState } from '../../redux/reduxStore';
 
 const UserSignUp = () => {
   const { signup } = useAuth();
-  const user = useSelector(data => data.user);
+  const user = useSelector((data: StoreState) => data.user);
   console.log(user, 'user');
   return (
     <Formik
@@ -48,7 +49,7 @@ const UserSignUp = () => {
       }}
       validationSchema={signupValidationSchema}
       onSubmit={values => {
-        signup(values);
+        signup({ ...values, userType: user.type || '' });
       }}>
       {({ handleChange, handleBlur, handleSubmit, values, setFieldValue }) => {
         useEffect(() => {
