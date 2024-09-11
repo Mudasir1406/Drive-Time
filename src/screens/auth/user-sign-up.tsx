@@ -1,5 +1,5 @@
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
-import React, {useEffect} from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useEffect } from 'react';
 import {
   Box,
   Button,
@@ -7,8 +7,8 @@ import {
   ScrollView,
   Text,
 } from '@gluestack-ui/themed';
-import {HStack} from '@gluestack-ui/themed';
-import {Formik} from 'formik';
+import { HStack } from '@gluestack-ui/themed';
+import { Formik } from 'formik';
 
 import CustomInput from '../../components/common-cpmponents/Input-field';
 import {
@@ -22,19 +22,19 @@ import {
   SelectDragIndicator,
   SelectDragIndicatorWrapper,
 } from '@gluestack-ui/themed';
-import {Icon} from '@gluestack-ui/themed';
+import { Icon } from '@gluestack-ui/themed';
 import CustomButton from '../../components/login-types/custom-button';
-import {colors} from '../../constant';
-import {useAuth} from '../../hooks/useAuth';
-import {signupValidationSchema} from '../../utils/validation-schemas';
-import {useSelector} from 'react-redux';
-import {StoreState} from '../../redux/reduxStore';
-import {loginScreenNavigationProps} from '../../types/types';
+import { colors } from '../../constant';
+import { useAuth } from '../../hooks/useAuth';
+import { signupValidationSchema } from '../../utils/validation-schemas';
+import { useSelector } from 'react-redux';
+import { StoreState } from '../../redux/reduxStore';
+import { loginScreenNavigationProps } from '../../types/types';
 type IProps = {
   navigation: loginScreenNavigationProps;
 };
-const UserSignUp: React.FC<IProps> = ({navigation}) => {
-  const {signup} = useAuth();
+const UserSignUp: React.FC<IProps> = ({ navigation }) => {
+  const { signup } = useAuth();
   const user = useSelector((data: StoreState) => data.user);
   console.log(user, 'user');
   return (
@@ -51,11 +51,11 @@ const UserSignUp: React.FC<IProps> = ({navigation}) => {
       }}
       validationSchema={signupValidationSchema}
       onSubmit={values => {
-        signup({...values, userType: user.type || ''});
+        signup({ ...values, userType: user.userType || 'user' });
       }}>
-      {({handleChange, handleBlur, handleSubmit, values, setFieldValue}) => {
+      {({ handleChange, handleBlur, handleSubmit, values, setFieldValue }) => {
         useEffect(() => {
-          console.log('Form Values:', {...values, userType: user.type});
+          console.log('Form Values:', { ...values, userType: user.userType });
         }, [values]);
 
         return (
@@ -162,7 +162,7 @@ const UserSignUp: React.FC<IProps> = ({navigation}) => {
                 <Text style={styles.centerText}>
                   Already have an account?{' '}
                   <Text
-                    style={{fontWeight: 700}}
+                    style={{ fontWeight: 700 }}
                     onPress={() => navigation.navigate('Login')}>
                     Login
                   </Text>

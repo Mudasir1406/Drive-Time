@@ -12,6 +12,7 @@ export type AuthStackParamList = {
   SignUpDriver: undefined;
   LoginType: undefined;
   guide: undefined;
+  forgetPassword: undefined;
 };
 
 export type LoginTypeNavigation = StackNavigationProp<
@@ -32,9 +33,16 @@ export type RootBottomTabParams = {
   Home: undefined;
   Profile: undefined;
 };
+export type RootBottomTabParamsDriver = {
+  Home: undefined;
+  Profile: undefined;
+};
 
 export type UserStackParamList = {
   BottomTab: NavigatorScreenParams<RootBottomTabParams>;
+};
+export type DriverStackParamList = {
+  BottomTab: NavigatorScreenParams<RootBottomTabParamsDriver>;
 };
 
 export type HomeScreenProps = CompositeScreenProps<

@@ -9,7 +9,7 @@ const Home: React.FC<HomeScreenProps> = () => {
   const userData = useSelector((state: StoreState) => state.user);
   return (
     <Block>
-      <Text>{userData.customerName}</Text>
+      <Text>{userData.firstname}</Text>
     </Block>
   );
 };

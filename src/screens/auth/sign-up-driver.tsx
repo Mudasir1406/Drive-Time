@@ -1,21 +1,21 @@
-import {Pressable, StyleSheet} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {Box, Image, ScrollView} from '@gluestack-ui/themed';
-import {Text} from '@gluestack-ui/themed';
-import {colors} from '../../constant';
-import UploadImage from '../../components/signup-driver/UploadImage';
-import {requestCameraPermission} from '../../utils/CameraPermission';
+import { Pressable, StyleSheet } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { Box, Image, ScrollView } from '@gluestack-ui/themed'
+import { Text } from '@gluestack-ui/themed'
+import { colors } from '../../constant'
+import UploadImage from '../../components/signup-driver/UploadImage'
+import { requestCameraPermission } from '../../utils/CameraPermission'
 import ImagePicker from 'react-native-image-crop-picker';
-import {Toast} from 'react-native-toast-notifications';
-import {uploadImage} from '../../services/storage-service/StorageService';
+import { Toast } from 'react-native-toast-notifications';
+import { uploadImage } from '../../services/storage-service/StorageService';
 import CameraModal from '../../components/common-cpmponents/Camera-modal';
 import DriverSignUpForm from '../../components/signup-driver/DriverSignUpForm';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {useAuth} from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth';
 import CustomButton from '../../components/login-types/custom-button';
 
 const SignUpDriver: React.FC = () => {
-  const {signup} = useAuth();
+  const { signup } = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
   const [personalInfo, setpersonalInfo] = useState(false);
   const [vehicleImages, setvehicleImages] = useState<string[]>([]);
@@ -122,8 +122,8 @@ const SignUpDriver: React.FC = () => {
             onPress={() => {
               setpersonalInfo(false);
             }}
-            style={{width: '100%'}}>
-            <Ionicons name="arrow-back-circle-sharp" style={{fontSize: 30}} />
+            style={{ width: '100%' }}>
+            <Ionicons name="arrow-back-circle-sharp" style={{ fontSize: 30 }} />
           </Pressable>
           <Text sx={styles.heading}>Driver's Information</Text>
           {vehicleImages?.length < 5 && (
@@ -140,9 +140,9 @@ const SignUpDriver: React.FC = () => {
                 return (
                   <Image
                     alt="oops"
-                    source={{uri: data}}
+                    source={{ uri: data }}
                     key={index}
-                    sx={{width: 100, height: 100, borderRadius: 10, margin: 10}}
+                    sx={{ width: 100, height: 100, borderRadius: 10, margin: 10 }}
                   />
                 );
               })}
@@ -162,9 +162,9 @@ const SignUpDriver: React.FC = () => {
                 return (
                   <Image
                     alt="oops"
-                    source={{uri: data}}
+                    source={{ uri: data }}
                     key={index}
-                    sx={{width: 100, height: 100, borderRadius: 10}}
+                    sx={{ width: 100, height: 100, borderRadius: 10 }}
                   />
                 );
               })}
@@ -184,9 +184,9 @@ const SignUpDriver: React.FC = () => {
                 return (
                   <Image
                     alt="oops"
-                    source={{uri: data}}
+                    source={{ uri: data }}
                     key={index}
-                    sx={{width: 100, height: 100, borderRadius: 10, margin: 10}}
+                    sx={{ width: 100, height: 100, borderRadius: 10, margin: 10 }}
                   />
                 );
               })}
@@ -206,9 +206,9 @@ const SignUpDriver: React.FC = () => {
                 return (
                   <Image
                     alt="oops"
-                    source={{uri: data}}
+                    source={{ uri: data }}
                     key={index}
-                    sx={{width: 100, height: 100, borderRadius: 10, margin: 10}}
+                    sx={{ width: 100, height: 100, borderRadius: 10, margin: 10 }}
                   />
                 );
               })}
