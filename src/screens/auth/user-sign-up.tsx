@@ -27,7 +27,7 @@ import { Icon } from '@gluestack-ui/themed';
 import CustomButton from '../../components/login-types/custom-button';
 import { colors } from '../../constant';
 import { useAuth } from '../../hooks/useAuth';
-import { signupValidationSchema } from '../../Utils/validation-schemas';
+import { signupValidationSchema } from '../../utils/validation-schemas';
 import { useSelector } from 'react-redux';
 import { StoreState } from '../../redux/reduxStore';
 

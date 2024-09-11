@@ -4,7 +4,7 @@ import { Box, Image, ScrollView } from '@gluestack-ui/themed'
 import { Text } from '@gluestack-ui/themed'
 import { colors } from '../../constant'
 import UploadImage from '../../components/signup-driver/UploadImage'
-import { requestCameraPermission } from '../../Utils/CameraPermission'
+import { requestCameraPermission } from '../../utils/CameraPermission'
 import ImagePicker from 'react-native-image-crop-picker';
 import { Toast } from 'react-native-toast-notifications'
 import { uploadImage } from '../../services/storage-service/StorageService'
