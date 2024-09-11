@@ -9,7 +9,7 @@ const AppContanier = () => {
   const userData = useSelector((state: StoreState) => state.user);
   return (
     <NavigationContainer>
-      {userData && userData.type === 'user' ? (
+      {userData && userData.type !== 'user' ? (
         <UserNavigation />
       ) : userData.type === 'driver' ? (
         <></>

@@ -62,10 +62,6 @@ export const useAuth = () => {
   };
 
   const login = async (formData: {email: string; password: string}) => {
-    if (!formData.email.trim() || !formData.password.trim()) {
-      toast.show('fill all the fields', {type: 'danger'});
-      return;
-    }
     let id = toast.show('Loading...');
     try {
       const userCredential = await auth().signInWithEmailAndPassword(
