@@ -27,6 +27,7 @@ export const userSliceIntialState: UserSliceType = {
   customerId: '',
   phoneno: '',
   userCard: undefined,
+  type: '',
 };
 
 export const userSlice = createSlice({
