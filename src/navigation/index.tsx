@@ -6,7 +6,8 @@ import UserNavigation from './user-navigation/user-navigation';
 const AppContanier = () => {
   return (
     <NavigationContainer>
-      <UserNavigation />
+      {/* <UserNavigation /> */}
+      {<AuthNavigation />}
     </NavigationContainer>
   );
 };
