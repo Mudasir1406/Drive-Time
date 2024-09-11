@@ -6,27 +6,46 @@ type actionType = PayloadAction<Partial<UserSliceType>>;
 
 export const setUser = (state: stateType, action: actionType) => {
   const {
-    accessToken,
-    customerEmail,
-    customerName,
+    dob,
+    email,
+    firstname,
+    gender,
+    lastname,
+    username,
+    userType,
     isLoggedIn,
-    drawerOpen,
-    customerId,
-    phoneno,
-    userCard,
-    type,
+    uid,
+    VehicleNo,
+    VehicleType,
+    cnic,
+    company,
+    license,
+    make,
+    phone,
+    registrationNo,
+    vehicleDocuments,
+    vehicleImages,
   } = action.payload;
 
-  state.accessToken =
-    accessToken !== undefined ? accessToken : state.accessToken;
-  state.customerEmail =
-    customerEmail !== undefined ? customerEmail : state.customerEmail;
-  state.customerName =
-    customerName !== undefined ? customerName : state.customerName;
+  state.dob = dob !== undefined ? dob : state.dob;
+  state.email = email !== undefined ? email : state.email;
+  state.firstname = firstname !== undefined ? firstname : state.firstname;
   state.isLoggedIn = isLoggedIn !== undefined ? isLoggedIn : state.isLoggedIn;
-  state.drawerOpen = drawerOpen !== undefined ? drawerOpen : state.drawerOpen;
-  state.customerId = customerId !== undefined ? customerId : state.customerId;
-  state.phoneno = phoneno !== undefined ? phoneno : state.phoneno;
-  state.userCard = userCard !== undefined ? userCard : state.userCard;
-  state.type = type ? type : state.type;
+  state.gender = gender !== undefined ? gender : state.gender;
+  state.lastname = lastname !== undefined ? lastname : state.lastname;
+  state.username = username !== undefined ? username : state.username;
+  state.userType = userType ? userType : state.userType;
+  state.uid = uid ? uid : state.uid;
+  state.phone = phone ? phone : state.phone;
+  state.VehicleNo = VehicleNo ? VehicleNo : state.VehicleNo;
+  state.VehicleType = VehicleType ? VehicleType : state.VehicleType;
+  state.company = company ? company : state.company;
+  state.make = make ? make : state.make;
+  state.registrationNo = registrationNo ? registrationNo : state.registrationNo;
+  state.cnic = cnic ? cnic : state.cnic;
+  state.license = license ? license : state.license;
+  state.vehicleDocuments = vehicleDocuments
+    ? vehicleDocuments
+    : state.vehicleDocuments;
+  state.vehicleImages = vehicleImages ? vehicleImages : state.vehicleImages;
 };

@@ -1,4 +1,5 @@
 const images = {
+  logo: 'https://firebasestorage.googleapis.com/v0/b/drive-time-6e9f8.appspot.com/o/logo_no_background-removebg-preview.png?alt=media&token=3f3834b2-c450-4a62-babd-8deefdd2adfc',
   guide1:
     'https://firebasestorage.googleapis.com/v0/b/drive-time-6e9f8.appspot.com/o/car7.png?alt=media&token=bf77060f-54ef-4a86-86d0-7540bc0d1595',
   onboardImage:

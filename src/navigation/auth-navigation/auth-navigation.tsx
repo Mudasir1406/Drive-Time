@@ -1,8 +1,9 @@
-import {StyleSheet, Text, View} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {AuthStackParamList} from '../../types/types';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { AuthStackParamList } from '../../types/types';
 import {
+  Forgetpassword,
   Guide,
   Login,
   LoginTypes,
@@ -31,8 +32,33 @@ const AuthNavigation = () => {
       <RootStack.Screen name="guide" component={Guide} />
 
       <RootStack.Screen name="LoginType" component={LoginTypes} />
-      <RootStack.Screen name="Login" component={Login} />
+      <RootStack.Screen
+        name="Login"
+        component={Login}
+        options={{
+          headerShown: true,
+          title: 'Login',
+          headerStyle: {
+            backgroundColor: '#f8f9fa',
+          },
+          headerTintColor: '#000',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+      />
       <RootStack.Screen name="SignUpUser" component={UserSignUp} />
+      <RootStack.Screen name="forgetPassword" component={Forgetpassword} options={{
+        headerShown: true,
+        title: 'Forget Password',
+        headerStyle: {
+          backgroundColor: '#f8f9fa',
+        },
+        headerTintColor: '#000',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+      }} />
       <RootStack.Screen name="SignUpDriver" component={SignUpDriver} />
     </RootStack.Navigator>
   );

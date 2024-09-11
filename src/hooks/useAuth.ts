@@ -62,10 +62,6 @@ export const useAuth = () => {
   };
 
   const login = async (formData: {email: string; password: string}) => {
-    if (!formData.email.trim() || !formData.password.trim()) {
-      toast.show('fill all the fields', {type: 'danger'});
-      return;
-    }
     let id = toast.show('Loading...');
     try {
       const userCredential = await auth().signInWithEmailAndPassword(
@@ -78,6 +74,11 @@ export const useAuth = () => {
       console.log('Error creating user:', error);
       toast.update(id, 'Login Error', {type: 'danger '});
     }
+  };
+  const logOut = async () => {
+    auth()
+      .signOut()
+      .then(() => console.log('logout'));
   };
 
   //   const googleSignup = async () => {
@@ -127,5 +128,13 @@ export const useAuth = () => {
   //       toast.update(id, 'Login Error', {type: 'danger '});
   //     }
   //   };
-  return {signup, login};
+  const getUserById = async (uid: string) => {
+    return firestore()
+      .collection('users')
+      .doc(uid)
+      .get()
+      .then(user => user.data())
+      .catch(err => console.log(err));
+  };
+  return {signup, login, logOut, getUserById};
 };

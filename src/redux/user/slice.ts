@@ -7,27 +7,47 @@ export type CardType = {
   cardName: string;
 };
 export type UserSliceType = {
-  accessToken?: string;
-  customerEmail?: string;
-  customerName?: string;
-  isLoggedIn?: boolean;
-  drawerOpen?: boolean;
-  customerId?: string;
-  phoneno?: string;
-  userCard?: CardType | undefined;
-  type?: 'driver' | 'user';
+  dob?: string;
+  email?: string;
+  firstname?: string;
+  gender?: string;
+  lastname?: string;
+  username?: string;
+  userType?: string;
+  uid?: string;
+  isLoggedIn: boolean;
+  VehicleNo?: string;
+  VehicleType?: string;
+  company?: string;
+  make?: string;
+  registrationNo?: string;
+  phone?: string;
+  vehicleImages?: [];
+  vehicleDocuments?: [];
+  license?: [];
+  cnic?: [];
 };
 
 export const userSliceIntialState: UserSliceType = {
-  accessToken: '',
-  customerEmail: '',
-  customerName: '',
   isLoggedIn: false,
-  drawerOpen: false,
-  customerId: '',
-  phoneno: '',
-  userCard: undefined,
-  type: undefined,
+  dob: '',
+  email: '',
+  firstname: '',
+  gender: '',
+  lastname: '',
+  username: '',
+  userType: '',
+  uid: '',
+  vehicleImages: [],
+  vehicleDocuments: [],
+  license: [],
+  cnic: [],
+  phone: '',
+  VehicleNo: '',
+  VehicleType: '',
+  company: '',
+  make: '',
+  registrationNo: '',
 };
 
 export const userSlice = createSlice({
