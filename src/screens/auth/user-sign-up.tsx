@@ -1,5 +1,5 @@
-import { StyleSheet, View } from 'react-native';
-import React, { useEffect } from 'react';
+import {StyleSheet, View} from 'react-native';
+import React, {useEffect} from 'react';
 import {
   Box,
   Button,
@@ -7,8 +7,8 @@ import {
   ScrollView,
   Text,
 } from '@gluestack-ui/themed';
-import { HStack } from '@gluestack-ui/themed';
-import { Formik } from 'formik';
+import {HStack} from '@gluestack-ui/themed';
+import {Formik} from 'formik';
 
 import CustomInput from '../../components/common-cpmponents/Input-field';
 import {
@@ -23,16 +23,16 @@ import {
   SelectDragIndicator,
   SelectDragIndicatorWrapper,
 } from '@gluestack-ui/themed';
-import { Icon } from '@gluestack-ui/themed';
+import {Icon} from '@gluestack-ui/themed';
 import CustomButton from '../../components/login-types/custom-button';
-import { colors } from '../../constant';
-import { useAuth } from '../../hooks/useAuth';
-import { signupValidationSchema } from '../../Utils/validation-schemas';
-import { useSelector } from 'react-redux';
-import { StoreState } from '../../redux/reduxStore';
+import {colors} from '../../constant';
+import {useAuth} from '../../hooks/useAuth';
+import {signupValidationSchema} from '../../utils/validation-schemas';
+import {useSelector} from 'react-redux';
+import {StoreState} from '../../redux/reduxStore';
 
 const UserSignUp = () => {
-  const { signup } = useAuth();
+  const {signup} = useAuth();
   const user = useSelector((data: StoreState) => data.user);
   console.log(user, 'user');
   return (
@@ -49,11 +49,11 @@ const UserSignUp = () => {
       }}
       validationSchema={signupValidationSchema}
       onSubmit={values => {
-        signup({ ...values, userType: user.type || '' });
+        signup({...values, userType: user.type || ''});
       }}>
-      {({ handleChange, handleBlur, handleSubmit, values, setFieldValue }) => {
+      {({handleChange, handleBlur, handleSubmit, values, setFieldValue}) => {
         useEffect(() => {
-          console.log('Form Values:', { ...values, userType: user.type });
+          console.log('Form Values:', {...values, userType: user.type});
         }, [values]);
 
         return (

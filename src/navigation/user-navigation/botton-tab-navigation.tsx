@@ -20,7 +20,6 @@ const BottomTab = () => {
           height: 70,
           overflow: 'hidden',
           width: '90%',
-          //   opacity: 0.9,
           bottom: 30,
           left: '5%',
         },
