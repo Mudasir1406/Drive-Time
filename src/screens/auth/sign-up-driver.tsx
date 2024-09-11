@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native'
-import React, { useState } from 'react'
+import { Pressable, StyleSheet } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { Box, Image, ScrollView } from '@gluestack-ui/themed'
 import { Text } from '@gluestack-ui/themed'
 import { colors } from '../../constant'
@@ -7,33 +7,55 @@ import UploadImage from '../../components/signup-driver/UploadImage'
 import { requestCameraPermission } from '../../Utils/CameraPermission'
 import ImagePicker from 'react-native-image-crop-picker';
 import { Toast } from 'react-native-toast-notifications'
-import { firebase } from '@react-native-firebase/auth'
 import { uploadImage } from '../../services/storage-service/StorageService'
 import CameraModal from '../../components/common-cpmponents/Camera-modal'
+import DriverSignUpForm from '../../components/signup-driver/DriverSignUpForm'
+import Ionicons from "react-native-vector-icons/Ionicons"
+import { useAuth } from '../../hooks/useAuth'
+import CustomButton from '../../components/login-types/custom-button'
 
-const SignUpDriver = () => {
+const SignUpDriver: React.FC = () => {
+    const { signup } = useAuth();
+    const [modalVisible, setModalVisible] = useState(false);
+    const [personalInfo, setpersonalInfo] = useState(false);
     const [vehicleImages, setvehicleImages] = useState<string[]>([]);
     const [vehicleDocuments, setvehicleDocuments] = useState<string[]>([]);
     const [license, setLisence] = useState<string[]>([]);
     const [cnic, setCnic] = useState<string[]>([]);
-    const [modalVisible, setModalVisible] = useState(false);
     const [currentImageType, setcurrentImageType] = useState<string>();
-    const setUploadImage = async (url: string) => {
-        console.log(url, 'setting');
+    const [PersonalData, setPersonalData] = useState({
+        username: '',
+        firstname: '',
+        lastname: '',
+        phone: '',
+        dob: '',
+        gender: '',
+        email: '',
+        make: '',
+        company: '',
+        VehicleNo: '',
+        VehicleType: '',
+        registrationNo: '',
+        password: '',
+    });
 
+
+
+
+    const setUploadImage = async (url: string) => {
         if (currentImageType === 'vehiclePicture') {
             setvehicleImages((prev) => (Array.isArray(prev) ? [...prev, url] : [url]));
         } else if (currentImageType === 'vehicleDocuments') {
             setvehicleDocuments((prev) => (Array.isArray(prev) ? [...prev, url] : [url]));
-        } else if (currentImageType === 'license') {
+        } else if (currentImageType === 'lisence') {
             setLisence((prev) => (Array.isArray(prev) ? [...prev, url] : [url]));
         } else if (currentImageType === 'cnic') {
             setCnic((prev) => (Array.isArray(prev) ? [...prev, url] : [url]));
         }
     };
+
     const openCamera = async () => {
         const test = await requestCameraPermission();
-        console.log(test);
 
         if (test) {
             ImagePicker.openCamera({
@@ -44,9 +66,7 @@ const SignUpDriver = () => {
 
                 console.log(image);
                 uploadImage(image.path).then((url) => {
-                    console.log(url, 'url');
                     if (url) {
-
                         setUploadImage(url)
                     }
                     Toast.show('Picture Updated', {
@@ -58,6 +78,7 @@ const SignUpDriver = () => {
         }
         setModalVisible(false);
     };
+
     const openGallery = () => {
         ImagePicker.openPicker({
             width: 300,
@@ -65,12 +86,11 @@ const SignUpDriver = () => {
             cropping: true,
             multiple: true,
         }).then(images => {
-            // If multiple images are selected
             console.log(images, 'multiple images');
             images.forEach((image: any) => {
                 uploadImage(image.path).then((url) => {
                     if (url) {
-                        setUploadImage(url); // Upload each image
+                        setUploadImage(url);
                     }
                 });
             });
@@ -81,16 +101,27 @@ const SignUpDriver = () => {
         });
         setModalVisible(false);
     };
+
     const openModal = (type: string) => {
         setcurrentImageType(type)
         setModalVisible(true);
     }
 
+    const SubmitDriverSignUp = () => {
+        signup({ ...PersonalData, userType: 'driver', vehicleImages: vehicleImages, vehicleDocuments: vehicleDocuments, license: license, cnic: cnic });
+    }
+
     return (
         <ScrollView>
-            <Box sx={styles.form} >
+            {personalInfo ? <Box sx={styles.form} >
+                <Pressable onPress={() => {
+                    setpersonalInfo(false)
+                }} style={{ width: "100%" }} >
+
+                    <Ionicons name='arrow-back-circle-sharp' style={{ fontSize: 30 }} />
+                </Pressable>
                 <Text sx={styles.heading} >Driver's Information</Text>
-                <UploadImage heading='Upload Vehicle Pictures' onPress={() => { openModal('vehiclePicture') }} />
+                {vehicleImages?.length < 5 && <UploadImage heading='Upload Vehicle Pictures' onPress={() => { openModal('vehiclePicture') }} />}
                 {vehicleImages && vehicleImages?.length > 0 && <Box sx={styles.imageWrapper} >
                     {vehicleImages.map((data, index) => {
                         return (
@@ -98,7 +129,7 @@ const SignUpDriver = () => {
                         )
                     })}
                 </Box>}
-                <UploadImage heading='Upload Vehicle Documents' onPress={() => { openModal('vehicleDocuments') }} />
+                {vehicleDocuments?.length < 5 && <UploadImage heading='Upload Vehicle Documents' onPress={() => { openModal('vehicleDocuments') }} />}
                 {vehicleDocuments && vehicleDocuments?.length > 0 && <Box sx={styles.imageWrapper} >
                     {vehicleDocuments.map((data, index) => {
                         return (
@@ -106,7 +137,7 @@ const SignUpDriver = () => {
                         )
                     })}
                 </Box>}
-                <UploadImage heading='Upload License (front/back)' onPress={() => { openModal('lisence') }} />
+                {license?.length < 3 && <UploadImage heading='Upload License (front/back)' onPress={() => { openModal('lisence') }} />}
                 {license && license?.length > 0 && <Box sx={styles.imageWrapper} >
                     {license.map((data, index) => {
                         return (
@@ -114,7 +145,7 @@ const SignUpDriver = () => {
                         )
                     })}
                 </Box>}
-                <UploadImage heading='Upload CNIC (front/back)' onPress={() => { openModal('cnic') }} />
+                {cnic?.length < 3 && <UploadImage heading='Upload CNIC (front/back)' onPress={() => { openModal('cnic') }} />}
                 {cnic && cnic?.length > 0 && <Box sx={styles.imageWrapper} >
                     {cnic.map((data, index) => {
                         return (
@@ -122,13 +153,16 @@ const SignUpDriver = () => {
                         )
                     })}
                 </Box>}
+                <Box sx={styles.submitButtonContainer}>
+                    <CustomButton text="Sign up" handlePress={SubmitDriverSignUp} />
+                </Box>
                 <CameraModal
                     openCamera={() => openCamera()}
                     openGallery={() => openGallery()}
                     modalVisible={modalVisible}
                     setModalVisible={setModalVisible}
                 />
-            </Box>
+            </Box> : <DriverSignUpForm PersonalData={PersonalData} setpersonalInfo={setpersonalInfo} setPersonalData={setPersonalData} />}
 
         </ScrollView>
     )
@@ -152,6 +186,11 @@ const styles = StyleSheet.create({
     },
     imageWrapper: {
         margin: 10, display: "flex", flexDirection: "row", gap: 5, width: "100%"
-    }
+    },
+    submitButtonContainer: {
+        marginTop: 20,
+
+        width: '100%',
+    },
 
 })

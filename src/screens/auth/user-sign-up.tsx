@@ -15,7 +15,6 @@ import {
   Select,
   SelectTrigger,
   SelectInput,
-  SelectIcon,
   SelectPortal,
   SelectContent,
   SelectItem,
@@ -49,7 +48,7 @@ const UserSignUp = () => {
       }}
       validationSchema={signupValidationSchema}
       onSubmit={values => {
-        signup({...values, userType: user.type});
+        signup({...values, userType: user.type || ''});
       }}>
       {({handleChange, handleBlur, handleSubmit, values, setFieldValue}) => {
         useEffect(() => {

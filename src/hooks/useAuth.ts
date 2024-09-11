@@ -12,7 +12,11 @@ export const useAuth = () => {
     dob: string;
     username: string;
     gender: string;
-    userType?: string;
+    userType: string;
+    vehicleImages?: string[];
+    vehicleDocuments?: string[];
+    license?: string[];
+    cnic?: string[];
   }) => {
     const {firstname, email, password} = formData;
 
