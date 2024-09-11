@@ -10,7 +10,7 @@ const Profile: React.FunctionComponent<ProfileScreenProps> = () => {
   return (
     <View>
       <TouchableOpacity style={{ width: '100%', marginTop: 5 }} onPress={() => { logOut() }} >
-        <Text style={styles.forgotStyle}>Forgot Password?</Text>
+        <Text style={styles.forgotStyle}>LOGOUT</Text>
       </TouchableOpacity>
     </View>
   );

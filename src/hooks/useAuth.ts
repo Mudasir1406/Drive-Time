@@ -1,6 +1,7 @@
 import {useToast} from 'react-native-toast-notifications';
 import auth, {updateProfile} from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 export const useAuth = () => {
   const toast = useToast();
   const signup = async (formData: {
@@ -81,53 +82,73 @@ export const useAuth = () => {
       .then(() => console.log('logout'));
   };
 
-  //   const googleSignup = async () => {
-  //     let id = toast.show('Loading...');
-  //     try {
-  //       // Configure Google Sign-In
-  //       GoogleSignin.configure({
-  //         webClientId:
-  //           '499076693311-jhkkbtecp1qjnhusnm32fnppkb4aoi91.apps.googleusercontent.com',
-  //       });
+  const googleSignup = async () => {
+    let id = toast.show('Loading...');
+    try {
+      // Configure Google Sign-In
+      GoogleSignin.configure({
+        webClientId:
+          '1048277062240-ke4fg7dk77mn7fabtgkvml6cnnv238dv.apps.googleusercontent.com',
+      });
 
-  //       // Check if your device supports Google Play
-  //       await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
+      // Check if your device supports Google Play
+      await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
 
-  //       // Get the user's ID token
-  //       const {idToken} = await GoogleSignin.signIn();
+      // Get the user's ID token
+      const userInfo = await GoogleSignin.signIn();
 
-  //       // Create a Google credential with the token
-  //       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      // Create a Google credential with the token
+      if (userInfo.data) {
+        const googleCredential = auth.GoogleAuthProvider.credential(
+          userInfo.data?.idToken,
+        );
+        const userCredential = await auth().signInWithCredential(
+          googleCredential,
+        );
+        const user = userCredential.user;
+        if (user.displayName) {
+          const [firstName, ...lastNameParts] = user?.displayName.split(' ');
+          const lastName = lastNameParts.join(' ');
+          // Check if the user already exists in Firestore
+          const userDoc = await firestore()
+            .collection('users')
+            .doc(user.uid)
+            .get();
 
-  //       // Sign-in the user with the credential
-  //       const userCredential = await auth().signInWithCredential(
-  //         googleCredential,
-  //       );
-  //       const user = userCredential.user;
-  //       console.log(user.uid, 'user.uid');
+          if (!userDoc.exists) {
+            // User does not exist, so create a new user document
+            await firestore().collection('users').doc(user.uid).set({
+              email: user.email,
+              firstname: firstName,
+              lastname: lastName,
+              phone: user.phoneNumber,
+              dob: '',
+              userType: 'user',
+              username: '',
+              gender: '',
 
-  //       // Check if the user already exists in Firestore
-  //       const userDoc = await firestore().collection('users').doc(user.uid).get();
-  //       console.log(userDoc, 'userDoc');
+              // Add other fields if needed
+            });
+          }
+        }
 
-  //       if (!userDoc.exists) {
-  //         // User does not exist, so create a new user document
-  //         await firestore().collection('users').doc(user.uid).set({
-  //           email: user.email,
-  //           name: user.displayName,
-  //           phone: user.phoneNumber,
-  //           // Add other fields if needed
-  //         });
-  //       } else {
-  //         console.log('alreadyCreated');
+        // Sign-in the user with the credential
+      } else {
+        console.log('alreadyCreated');
 
-  //         // User already exists
-  //       }
-  //       toast.update(id, 'Login Success', {type: 'success'});
-  //     } catch (error) {
-  //       toast.update(id, 'Login Error', {type: 'danger '});
-  //     }
-  //   };
+        //         // User already exists
+        //       }
+        //       toast.update(id, 'Login Success', {type: 'success'});
+        //     } catch (error) {
+        //       toast.update(id, 'Login Error', {type: 'danger '});
+        //     }
+        //   };
+      }
+      toast.update(id, 'Login Success', {type: 'success'});
+    } catch (error) {
+      toast.update(id, 'Login Error', {type: 'danger '});
+    }
+  };
   const getUserById = async (uid: string) => {
     return firestore()
       .collection('users')
@@ -136,5 +157,7 @@ export const useAuth = () => {
       .then(user => user.data())
       .catch(err => console.log(err));
   };
-  return {signup, login, logOut, getUserById};
+  // User already exists
+
+  return {signup, login, googleSignup, getUserById, logOut};
 };

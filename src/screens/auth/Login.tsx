@@ -1,6 +1,6 @@
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import React from 'react';
-import { Box } from '@gluestack-ui/themed';
+import { Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Box, Image } from '@gluestack-ui/themed';
 import { Text } from '@gluestack-ui/themed';
 import { colors } from '../../constant';
 import CustomInput from '../../components/common-cpmponents/Input-field';
@@ -8,6 +8,7 @@ import { Formik } from 'formik';
 import { loginValidationSchema } from '../../utils/validation-schemas';
 import CustomButton from '../../components/login-types/custom-button';
 import { useAuth } from '../../hooks/useAuth';
+import { images } from '../../constant';
 import { LoginTypeNavigation } from '../../types/types';
 
 type Iprops = {
@@ -15,7 +16,11 @@ type Iprops = {
 }
 
 const Login: React.FC<Iprops> = ({ navigation }) => {
-  const { login, logOut } = useAuth();
+
+  const { login, googleSignup } = useAuth();
+  const handleGoogleSign = () => {
+    googleSignup();
+  };
 
   return (
     <Formik
@@ -56,6 +61,14 @@ const Login: React.FC<Iprops> = ({ navigation }) => {
             <TouchableOpacity style={{ width: '100%', marginTop: 5 }} onPress={() => { navigation.navigate('forgetPassword') }} >
               <Text sx={styles.forgotStyle}>Forgot Password?</Text>
             </TouchableOpacity>
+            <Text sx={styles.forgotStyle}>OR</Text>
+            <Pressable style={styles.circle} onPress={handleGoogleSign}>
+              <Image
+                source={{ uri: images.googleIcon }}
+                alt="oops"
+                sx={styles.googleIcon}
+              />
+            </Pressable>
           </Box>
         );
       }}
@@ -84,5 +97,21 @@ const styles = StyleSheet.create({
     fontWeight: 700,
     fontSize: 15,
     textAlign: 'right',
+  },
+  googleIcon: {
+    height: 30,
+    width: 30,
+    // marginTop: 10,
+  },
+  circle: {
+    marginTop: 15,
+    height: 50,
+    width: 50,
+    borderRadius: 25,
+    backgroundColor: colors.white,
+    elevation: 7,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

@@ -51,7 +51,7 @@ const UserSignUp: React.FC<IProps> = ({ navigation }) => {
       }}
       validationSchema={signupValidationSchema}
       onSubmit={values => {
-        signup({ ...values, userType: user.userType || '' });
+        signup({ ...values, userType: user.userType || 'user' });
       }}>
       {({ handleChange, handleBlur, handleSubmit, values, setFieldValue }) => {
         useEffect(() => {

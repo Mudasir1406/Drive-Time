@@ -15,6 +15,8 @@ const AppContanier = () => {
   const dispatch = useDispatch<StoreDispatch>();
   const userData = useSelector((state: StoreState) => state.user);
   async function onAuthStateChanged(user: any) {
+    console.log(user, 'dfsjkfk');
+
     if (user) {
 
 
@@ -38,10 +40,16 @@ const AppContanier = () => {
 
   return (
     <NavigationContainer>
-      {userData.isLoggedIn && userData.userType === 'user' ? (
-        <UserNavigation />
-      ) : userData.userType === 'driver' ? (
-        <DriverNavigation />
+      {userData.isLoggedIn ? (
+        <>
+          {userData.userType === 'user' ? (
+            <UserNavigation />
+          ) : userData.userType === 'driver' ? (
+            <DriverNavigation />
+          ) : (
+            <AuthNavigation />
+          )}
+        </>
       ) : (
         <AuthNavigation />
       )}
