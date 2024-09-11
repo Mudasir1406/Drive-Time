@@ -15,7 +15,7 @@ export type UserSliceType = {
   customerId?: string;
   phoneno?: string;
   userCard?: CardType | undefined;
-  type?: string;
+  type?: 'driver' | 'user';
 };
 
 export const userSliceIntialState: UserSliceType = {
@@ -27,7 +27,7 @@ export const userSliceIntialState: UserSliceType = {
   customerId: '',
   phoneno: '',
   userCard: undefined,
-  type: '',
+  type: undefined,
 };
 
 export const userSlice = createSlice({

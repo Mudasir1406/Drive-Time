@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import React, { useEffect } from 'react';
 import {
   Box,
@@ -15,7 +15,6 @@ import {
   Select,
   SelectTrigger,
   SelectInput,
-  SelectIcon,
   SelectPortal,
   SelectContent,
   SelectItem,
@@ -27,11 +26,14 @@ import { Icon } from '@gluestack-ui/themed';
 import CustomButton from '../../components/login-types/custom-button';
 import { colors } from '../../constant';
 import { useAuth } from '../../hooks/useAuth';
-import { signupValidationSchema } from '../../utils/validation-schemas';
+import { signupValidationSchema } from '../../Utils/validation-schemas';
 import { useSelector } from 'react-redux';
 import { StoreState } from '../../redux/reduxStore';
-
-const UserSignUp = () => {
+import { loginScreenNavigationProps } from '../../types/types';
+type IProps = {
+  navigation: loginScreenNavigationProps;
+};
+const UserSignUp: React.FC<IProps> = ({ navigation }) => {
   const { signup } = useAuth();
   const user = useSelector((data: StoreState) => data.user);
   console.log(user, 'user');
@@ -152,6 +154,20 @@ const UserSignUp = () => {
               <Box sx={styles.submitButtonContainer}>
                 <CustomButton text="Sign up" handlePress={handleSubmit} />
               </Box>
+              <Box
+                sx={{
+                  width: '100%',
+                  marginTop: 10,
+                }}>
+                <Text style={styles.centerText}>
+                  Already have an account?{' '}
+                  <Text
+                    style={{ fontWeight: 700 }}
+                    onPress={() => navigation.navigate('Login')}>
+                    Login
+                  </Text>
+                </Text>
+              </Box>
             </Box>
           </ScrollView>
         );
@@ -190,5 +206,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
 
     width: '100%',
+  },
+  centerText: {
+    textAlign: 'center',
+    fontSize: 15,
   },
 });

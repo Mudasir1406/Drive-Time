@@ -18,6 +18,11 @@ export type LoginTypeNavigation = StackNavigationProp<
   AuthStackParamList,
   'LoginType'
 >;
+export type loginScreenNavigationProps = StackNavigationProp<
+  AuthStackParamList,
+  'Login'
+>;
+
 export type guideScreenNavigationProps = StackNavigationProp<
   AuthStackParamList,
   'guide'
