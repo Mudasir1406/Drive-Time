@@ -1,6 +1,12 @@
+import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
+import {
+  CompositeScreenProps,
+  NavigatorScreenParams,
+} from '@react-navigation/native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {StackNavigationProp} from '@react-navigation/stack';
 
-export type RootStackParamList = {
+export type AuthStackParamList = {
   Login: undefined;
   SignUpUser: undefined;
   SignUpDriver: undefined;
@@ -9,10 +15,28 @@ export type RootStackParamList = {
 };
 
 export type LoginTypeNavigation = StackNavigationProp<
-  RootStackParamList,
+  AuthStackParamList,
   'LoginType'
 >;
 export type guideScreenNavigationProps = StackNavigationProp<
-  RootStackParamList,
+  AuthStackParamList,
   'guide'
+>;
+
+export type RootBottomTabParams = {
+  Home: undefined;
+  Profile: undefined;
+};
+
+export type UserStackParamList = {
+  BottomTab: NavigatorScreenParams<RootBottomTabParams>;
+};
+
+export type HomeScreenProps = CompositeScreenProps<
+  BottomTabScreenProps<RootBottomTabParams, 'Home'>,
+  NativeStackScreenProps<UserStackParamList>
+>;
+export type ProfileScreenProps = CompositeScreenProps<
+  BottomTabScreenProps<RootBottomTabParams, 'Profile'>,
+  NativeStackScreenProps<UserStackParamList>
 >;

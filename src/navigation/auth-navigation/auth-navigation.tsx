@@ -1,10 +1,16 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../types/types';
-import { Guide, Login, LoginTypes, SignUpDriver, UserSignUp } from '../../screens/auth';
+import {StyleSheet, Text, View} from 'react-native';
+import React from 'react';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {AuthStackParamList} from '../../types/types';
+import {
+  Guide,
+  Login,
+  LoginTypes,
+  SignUpDriver,
+  UserSignUp,
+} from '../../screens/auth';
 
-const RootStack = createNativeStackNavigator<RootStackParamList>();
+const RootStack = createNativeStackNavigator<AuthStackParamList>();
 const AuthNavigation = () => {
   return (
     <RootStack.Navigator
@@ -29,9 +35,9 @@ const AuthNavigation = () => {
       <RootStack.Screen name="SignUpUser" component={UserSignUp} />
       <RootStack.Screen name="SignUpDriver" component={SignUpDriver} />
     </RootStack.Navigator>
-  )
-}
+  );
+};
 
-export default AuthNavigation
+export default AuthNavigation;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});

@@ -11,13 +11,16 @@ import {GluestackUIProvider} from '@gluestack-ui/themed';
 import {config} from '@gluestack-ui/config';
 import {Provider} from 'react-redux';
 import reduxStore from './src/redux/reduxStore';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 function App(): React.JSX.Element {
   return (
     <Provider store={reduxStore}>
-      <GluestackUIProvider config={config}>
-        <AppContanier />
-      </GluestackUIProvider>
+      <SafeAreaProvider>
+        <GluestackUIProvider config={config}>
+          <AppContanier />
+        </GluestackUIProvider>
+      </SafeAreaProvider>
     </Provider>
   );
 }
