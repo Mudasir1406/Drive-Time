@@ -1,23 +1,27 @@
-import { StyleSheet, Text, View } from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import { Box, Image } from '@gluestack-ui/themed';
-import { images } from '../../constant';
+import {Box, Image} from '@gluestack-ui/themed';
+import {images} from '../../constant';
 import CustomButton from '../../components/login-types/custom-button';
-import { useDispatch } from 'react-redux';
-import { setUser } from '../../redux/user/reducer';
-import { LoginTypeNavigation } from '../../types/types';
-import { StoreDispatch } from '../../redux/reduxStore';
-import { userActions } from '../../redux/user/slice';
+import {useDispatch} from 'react-redux';
+import {setUser} from '../../redux/user/reducer';
+import {LoginTypeNavigation} from '../../types/types';
+import {StoreDispatch} from '../../redux/reduxStore';
+import {userActions} from '../../redux/user/slice';
+import LogoSection from '../../components/common/logo-section';
 type IProps = {
   navigation: LoginTypeNavigation;
 };
 
-const LoginTypes: React.FC<IProps> = ({ navigation }) => {
+const LoginTypes: React.FunctionComponent<LoginTypeNavigation> = ({
+  navigation,
+}) => {
   const dispatch = useDispatch<StoreDispatch>();
   return (
     <Box sx={styles.container}>
+      <LogoSection />
       <Image
-        source={{ uri: images.onboardImage }} // Image from URI
+        source={{uri: images.onboardImage}} // Image from URI
         style={styles.image}
         alt="oops"
       />

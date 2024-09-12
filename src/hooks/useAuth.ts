@@ -136,13 +136,7 @@ export const useAuth = () => {
       } else {
         console.log('alreadyCreated');
 
-        //         // User already exists
-        //       }
-        //       toast.update(id, 'Login Success', {type: 'success'});
-        //     } catch (error) {
-        //       toast.update(id, 'Login Error', {type: 'danger '});
-        //     }
-        //   };
+        // User already exists
       }
       toast.update(id, 'Login Success', {type: 'success'});
     } catch (error) {
