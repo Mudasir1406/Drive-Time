@@ -6,6 +6,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Home from '../../screens/user/home';
 import Profile from '../../screens/user/profile';
+import {Header} from '../../components';
 const Tab = createBottomTabNavigator<RootBottomTabParams>();
 const BottomTab = () => {
   return (
@@ -23,7 +24,6 @@ const BottomTab = () => {
           bottom: 30,
           left: '5%',
         },
-        headerShown: false,
       }}>
       <Tab.Screen
         options={{
@@ -32,6 +32,7 @@ const BottomTab = () => {
           tabBarIcon: ({color, size}) => (
             <Ionicons name="home" color={color} size={size} />
           ),
+          header: props => <Header heading={props.route.name} />,
         }}
         name="Home"
         component={Home}
