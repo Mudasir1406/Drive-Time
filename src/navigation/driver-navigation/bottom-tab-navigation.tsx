@@ -4,8 +4,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Home from '../../screens/user/home';
 import Profile from '../../screens/user/profile';
+import { HomeDriver } from '../../screens';
 const Tab = createBottomTabNavigator<RootBottomTabParamsDriver>();
 const BottomTab = () => {
     return (
@@ -34,7 +34,7 @@ const BottomTab = () => {
                     ),
                 }}
                 name="Home"
-                component={Home}
+                component={HomeDriver}
             />
             <Tab.Screen
                 options={{
