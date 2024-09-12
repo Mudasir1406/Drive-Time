@@ -11,7 +11,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import MapView, { Callout, LatLng, Marker } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import getDistance from 'geolib/es/getPreciseDistance';
-import { requestCameraPermission } from '../../utils/CameraPermission';
+import { requestCameraPermission } from '../../utils/camera-permission';
 import { colors } from '../../constant';
 
 type MyObjectType = {

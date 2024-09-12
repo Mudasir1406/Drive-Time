@@ -19,6 +19,10 @@ export type LoginTypeNavigation = NativeStackScreenProps<
   AuthStackParamList,
   'LoginType'
 >;
+export type forgetScreenNavigationProps = NativeStackScreenProps<
+  AuthStackParamList,
+  'forgetPassword'
+>;
 export type loginScreenNavigationProps = NativeStackScreenProps<
   AuthStackParamList,
   'Login'

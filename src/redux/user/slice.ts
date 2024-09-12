@@ -26,6 +26,7 @@ export type UserSliceType = {
   vehicleDocuments?: [];
   license?: [];
   cnic?: [];
+  profile?: '';
 };
 
 export const userSliceIntialState: UserSliceType = {

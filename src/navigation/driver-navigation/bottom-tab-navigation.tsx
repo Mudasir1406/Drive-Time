@@ -4,8 +4,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Profile from '../../screens/user/profile';
+import Profile from '../../screens/driver/profile';
 import { HomeDriver } from '../../screens';
+import CustomDriverHeader from '../../components/common/header-driver';
 const Tab = createBottomTabNavigator<RootBottomTabParamsDriver>();
 const BottomTab = () => {
     return (
@@ -23,10 +24,11 @@ const BottomTab = () => {
                     bottom: 30,
                     left: '5%',
                 },
-                headerShown: false,
+                headerShown: true,
             }}>
             <Tab.Screen
                 options={{
+                    header: () => <CustomDriverHeader />,
                     tabBarLabelStyle: { marginBottom: 10 },
                     tabBarLabel: 'Home',
                     tabBarIcon: ({ color, size }) => (
@@ -38,6 +40,7 @@ const BottomTab = () => {
             />
             <Tab.Screen
                 options={{
+                    header: () => <CustomDriverHeader />,
                     tabBarLabelStyle: { marginBottom: 10 },
                     tabBarLabel: 'Profile',
                     tabBarIcon: ({ color, size }) => (
