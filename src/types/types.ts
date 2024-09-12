@@ -15,18 +15,28 @@ export type AuthStackParamList = {
   forgetPassword: undefined;
 };
 
-export type LoginTypeNavigation = StackNavigationProp<
+export type LoginTypeNavigation = NativeStackScreenProps<
   AuthStackParamList,
   'LoginType'
 >;
-export type loginScreenNavigationProps = StackNavigationProp<
+export type loginScreenNavigationProps = NativeStackScreenProps<
   AuthStackParamList,
   'Login'
 >;
 
-export type guideScreenNavigationProps = StackNavigationProp<
+export type guideScreenNavigationProps = NativeStackScreenProps<
   AuthStackParamList,
   'guide'
+>;
+
+export type signupUserScreenNavigationProps = NativeStackScreenProps<
+  AuthStackParamList,
+  'SignUpUser'
+>;
+
+export type signupdriverScreenNavigationProps = NativeStackScreenProps<
+  AuthStackParamList,
+  'SignUpDriver'
 >;
 
 export type RootBottomTabParams = {

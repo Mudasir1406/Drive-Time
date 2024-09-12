@@ -1,23 +1,18 @@
 import React from 'react';
-import { Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Box, Image } from '@gluestack-ui/themed';
-import { Text } from '@gluestack-ui/themed';
-import { colors } from '../../constant';
-import CustomInput from '../../components/common-cpmponents/Input-field';
-import { Formik } from 'formik';
-import { loginValidationSchema } from '../../utils/validation-schemas';
+import {Pressable, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {Box, Image} from '@gluestack-ui/themed';
+import {Text} from '@gluestack-ui/themed';
+import {colors} from '../../constant';
+import CustomInput from '../../components/common/Input-field';
+import {Formik} from 'formik';
+import {loginValidationSchema} from '../../utils/validation-schemas';
 import CustomButton from '../../components/login-types/custom-button';
-import { useAuth } from '../../hooks/useAuth';
-import { images } from '../../constant';
-import { LoginTypeNavigation } from '../../types/types';
+import {useAuth} from '../../hooks/useAuth';
+import {images} from '../../constant';
+import {loginScreenNavigationProps} from '../../types/types';
 
-type Iprops = {
-  navigation: LoginTypeNavigation
-}
-
-const Login: React.FC<Iprops> = ({ navigation }) => {
-
-  const { login, googleSignup } = useAuth();
+const Login: React.FC<loginScreenNavigationProps> = ({navigation}) => {
+  const {login, googleSignup} = useAuth();
   const handleGoogleSign = () => {
     googleSignup();
   };
@@ -30,11 +25,11 @@ const Login: React.FC<Iprops> = ({ navigation }) => {
       }}
       validationSchema={loginValidationSchema}
       onSubmit={values => login(values)}>
-      {({ handleChange, handleBlur, handleSubmit, values }) => {
+      {({handleChange, handleBlur, handleSubmit, values}) => {
         return (
           <Box sx={styles.main}>
             <Text sx={styles.textStyle}>Welcome back,Login</Text>
-            <Box sx={{ width: '100%' }}>
+            <Box sx={{width: '100%'}}>
               <CustomInput
                 label="Email"
                 name="email"
@@ -44,7 +39,7 @@ const Login: React.FC<Iprops> = ({ navigation }) => {
                 value={values.email}
               />
             </Box>
-            <Box sx={{ width: '100%' }}>
+            <Box sx={{width: '100%'}}>
               <CustomInput
                 label="Password"
                 name="password"
@@ -55,16 +50,20 @@ const Login: React.FC<Iprops> = ({ navigation }) => {
                 value={values.password}
               />
             </Box>
-            <Box sx={{ width: '100%' }}>
+            <Box sx={{width: '100%'}}>
               <CustomButton text="Login" handlePress={handleSubmit} />
             </Box>
-            <TouchableOpacity style={{ width: '100%', marginTop: 5 }} onPress={() => { navigation.navigate('forgetPassword') }} >
+            <TouchableOpacity
+              style={{width: '100%', marginTop: 5}}
+              onPress={() => {
+                navigation.navigate('forgetPassword');
+              }}>
               <Text sx={styles.forgotStyle}>Forgot Password?</Text>
             </TouchableOpacity>
             <Text sx={styles.forgotStyle}>OR</Text>
             <Pressable style={styles.circle} onPress={handleGoogleSign}>
               <Image
-                source={{ uri: images.googleIcon }}
+                source={{uri: images.googleIcon}}
                 alt="oops"
                 sx={styles.googleIcon}
               />
