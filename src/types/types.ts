@@ -54,9 +54,11 @@ export type RootBottomTabParamsDriver = {
 
 export type UserStackParamList = {
   BottomTab: NavigatorScreenParams<RootBottomTabParams>;
+  EditProfile: undefined;
 };
 export type DriverStackParamList = {
   BottomTab: NavigatorScreenParams<RootBottomTabParamsDriver>;
+  EditProfile: undefined;
 };
 
 export type HomeScreenProps = CompositeScreenProps<
@@ -66,4 +68,17 @@ export type HomeScreenProps = CompositeScreenProps<
 export type ProfileScreenProps = CompositeScreenProps<
   BottomTabScreenProps<RootBottomTabParams, 'Profile'>,
   NativeStackScreenProps<UserStackParamList>
+>;
+
+export type DriverProfileScreenProps = CompositeScreenProps<
+  BottomTabScreenProps<RootBottomTabParamsDriver, 'Profile'>,
+  NativeStackScreenProps<DriverStackParamList>
+>;
+export type DriverEditProfileScreenProps = NativeStackScreenProps<
+  DriverStackParamList,
+  'EditProfile'
+>;
+export type UserEditProfileScreenProps = NativeStackScreenProps<
+  UserStackParamList,
+  'EditProfile'
 >;

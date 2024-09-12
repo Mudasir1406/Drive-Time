@@ -3,6 +3,7 @@ import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {UserStackParamList} from '../../types/types';
 import BottomTab from './botton-tab-navigation';
+import EditProfile from '../../screens/user/edit-profile';
 
 const RootStack = createNativeStackNavigator<UserStackParamList>();
 const UserNavigation = () => {
@@ -23,6 +24,21 @@ const UserNavigation = () => {
         animationDuration: 300,
       }}>
       <RootStack.Screen name="BottomTab" component={BottomTab} />
+      <RootStack.Screen
+        name="EditProfile"
+        component={EditProfile}
+        options={{
+          headerShown: true,
+          title: 'Edit Profile',
+          headerStyle: {
+            backgroundColor: '#f8f9fa',
+          },
+          headerTintColor: '#000',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+      />
     </RootStack.Navigator>
   );
 };
