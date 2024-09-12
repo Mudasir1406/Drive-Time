@@ -1,21 +1,28 @@
-import { Pressable, StyleSheet } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { Box, Image, ScrollView } from '@gluestack-ui/themed'
-import { Text } from '@gluestack-ui/themed'
-import { colors } from '../../constant'
-import UploadImage from '../../components/signup-driver/UploadImage'
-import { requestCameraPermission } from '../../utils/CameraPermission'
+import {Pressable, StyleSheet} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Box, Image, ScrollView} from '@gluestack-ui/themed';
+import {Text} from '@gluestack-ui/themed';
+import {colors} from '../../constant';
+import UploadImage from '../../components/signup-driver/upload-image';
+import {requestCameraPermission} from '../../utils/camera-permission';
 import ImagePicker from 'react-native-image-crop-picker';
-import { Toast } from 'react-native-toast-notifications';
-import { uploadImage } from '../../services/storage-service/StorageService';
-import CameraModal from '../../components/common-cpmponents/Camera-modal';
-import DriverSignUpForm from '../../components/signup-driver/DriverSignUpForm';
+import {Toast} from 'react-native-toast-notifications';
+import {uploadImage} from '../../services/storage-service/StorageService';
+import CameraModal from '../../components/common/camera-modal';
+import DriverSignUpForm from '../../components/signup-driver/driver-signup-form';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useAuth } from '../../hooks/useAuth';
+import {useAuth} from '../../hooks/useAuth';
 import CustomButton from '../../components/login-types/custom-button';
+import {
+  loginScreenNavigationProps,
+  signupdriverScreenNavigationProps,
+} from '../../types/types';
 
-const SignUpDriver: React.FC = () => {
-  const { signup } = useAuth();
+const SignUpDriver: React.FC<signupdriverScreenNavigationProps> = ({
+  navigation,
+  route,
+}) => {
+  const {signup} = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
   const [personalInfo, setpersonalInfo] = useState(false);
   const [vehicleImages, setvehicleImages] = useState<string[]>([]);
@@ -122,8 +129,8 @@ const SignUpDriver: React.FC = () => {
             onPress={() => {
               setpersonalInfo(false);
             }}
-            style={{ width: '100%' }}>
-            <Ionicons name="arrow-back-circle-sharp" style={{ fontSize: 30 }} />
+            style={{width: '100%'}}>
+            <Ionicons name="arrow-back-circle-sharp" style={{fontSize: 30}} />
           </Pressable>
           <Text sx={styles.heading}>Driver's Information</Text>
           {vehicleImages?.length < 5 && (
@@ -140,9 +147,9 @@ const SignUpDriver: React.FC = () => {
                 return (
                   <Image
                     alt="oops"
-                    source={{ uri: data }}
+                    source={{uri: data}}
                     key={index}
-                    sx={{ width: 100, height: 100, borderRadius: 10, margin: 10 }}
+                    sx={{width: 100, height: 100, borderRadius: 10, margin: 10}}
                   />
                 );
               })}
@@ -162,9 +169,9 @@ const SignUpDriver: React.FC = () => {
                 return (
                   <Image
                     alt="oops"
-                    source={{ uri: data }}
+                    source={{uri: data}}
                     key={index}
-                    sx={{ width: 100, height: 100, borderRadius: 10 }}
+                    sx={{width: 100, height: 100, borderRadius: 10}}
                   />
                 );
               })}
@@ -184,9 +191,9 @@ const SignUpDriver: React.FC = () => {
                 return (
                   <Image
                     alt="oops"
-                    source={{ uri: data }}
+                    source={{uri: data}}
                     key={index}
-                    sx={{ width: 100, height: 100, borderRadius: 10, margin: 10 }}
+                    sx={{width: 100, height: 100, borderRadius: 10, margin: 10}}
                   />
                 );
               })}
@@ -206,9 +213,9 @@ const SignUpDriver: React.FC = () => {
                 return (
                   <Image
                     alt="oops"
-                    source={{ uri: data }}
+                    source={{uri: data}}
                     key={index}
-                    sx={{ width: 100, height: 100, borderRadius: 10, margin: 10 }}
+                    sx={{width: 100, height: 100, borderRadius: 10, margin: 10}}
                   />
                 );
               })}
@@ -217,6 +224,7 @@ const SignUpDriver: React.FC = () => {
           <Box sx={styles.submitButtonContainer}>
             <CustomButton text="Sign up" handlePress={SubmitDriverSignUp} />
           </Box>
+
           <CameraModal
             openCamera={() => openCamera()}
             openGallery={() => openGallery()}
@@ -256,6 +264,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 5,
     width: '100%',
+  },
+  centerText: {
+    textAlign: 'center',
+    fontSize: 15,
   },
   submitButtonContainer: {
     marginTop: 20,
