@@ -25,6 +25,7 @@ export const setUser = (state: stateType, action: actionType) => {
     registrationNo,
     vehicleDocuments,
     vehicleImages,
+    profile,
   } = action.payload;
 
   state.dob = dob !== undefined ? dob : state.dob;
@@ -35,7 +36,7 @@ export const setUser = (state: stateType, action: actionType) => {
   state.lastname = lastname !== undefined ? lastname : state.lastname;
   state.username = username !== undefined ? username : state.username;
   state.userType = userType ? userType : state.userType;
-  state.uid = uid ? uid : state.uid;
+  state.profile = profile ? profile : state.profile;
   state.phone = phone ? phone : state.phone;
   state.VehicleNo = VehicleNo ? VehicleNo : state.VehicleNo;
   state.VehicleType = VehicleType ? VehicleType : state.VehicleType;

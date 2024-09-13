@@ -1,15 +1,19 @@
 import {Pressable, StyleSheet, Text, View} from 'react-native';
-import React, {ReactNode} from 'react';
-import {colors, images} from '../../constant';
+import React, {ReactNode, useState} from 'react';
+import {colors} from '../../constant';
 import {useSelector} from 'react-redux';
 import {StoreState} from '../../redux/reduxStore';
-import {Box} from '@gluestack-ui/themed';
+import {Box, Avatar, AvatarImage} from '@gluestack-ui/themed';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Image} from '@gluestack-ui/themed';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {DriverProfileScreenProps} from '../../types/types';
+import {requestCameraPermission} from '../../utils/camera-permission';
+import ImagePicker from 'react-native-image-crop-picker';
+import ProfileModal from '../../components/common/profile-image-modal';
+import {uploadImage} from '../../services/storage-service/StorageService';
+import {useUser} from '../../hooks/useUser';
 
 interface HelpBoxProps {
   text: string;
@@ -27,6 +31,62 @@ const HelpBox: React.FC<HelpBoxProps> = ({text, icon}) => {
 
 const Profile: React.FC<DriverProfileScreenProps> = ({navigation}) => {
   const userData = useSelector((state: StoreState) => state.user);
+  console.log(userData, 'userDa');
+  const {updateUserProfile} = useUser();
+  const [modalVisible, setModalVisible] = useState(false);
+  const openCamera = async () => {
+    const test = await requestCameraPermission();
+
+    if (test) {
+      ImagePicker.openCamera({
+        width: 300,
+        height: 400,
+        cropping: true,
+      }).then(image => {
+        console.log(image);
+        uploadImage(image.path).then(url => {
+          updateUserProfile(userData.uid, {...userData, profile: url});
+        });
+      });
+    }
+    setModalVisible(false);
+  };
+
+  const openGallery = () => {
+    ImagePicker.openPicker({
+      width: 300,
+      height: 400,
+      cropping: true,
+    }).then(image => {
+      console.log(image);
+      uploadImage(image.path).then(url => {
+        updateUserProfile(userData.uid, {...userData, profile: url});
+      });
+    });
+    setModalVisible(false);
+  };
+  const renderAvatar = () => {
+    if (userData?.profile) {
+      return (
+        <Pressable onPress={() => setModalVisible(!modalVisible)}>
+          <Avatar>
+            <AvatarImage source={{uri: userData?.profile}} alt="profile" />
+          </Avatar>
+        </Pressable>
+      );
+    } else {
+      return (
+        <Pressable onPress={() => setModalVisible(!modalVisible)}>
+          <Avatar sx={styles.avatar}>
+            <Text style={styles.avatarText}>
+              {userData.firstname && userData?.firstname.charAt(0)}
+            </Text>
+          </Avatar>
+        </Pressable>
+      );
+    }
+  };
+
   const boxContent = {
     help: {
       text: 'Help',
@@ -47,6 +107,7 @@ const Profile: React.FC<DriverProfileScreenProps> = ({navigation}) => {
       ),
     },
   };
+
   return (
     <View style={{flex: 1}}>
       <View
@@ -63,26 +124,7 @@ const Profile: React.FC<DriverProfileScreenProps> = ({navigation}) => {
             Welcome, {userData?.lastname}
           </Text>
         </Box>
-        <Box sx={styles.ImageBox}>
-          <Image
-            source={{
-              uri:
-                userData && userData?.profile ? userData?.profile : images.logo,
-            }}
-            style={{
-              width: 80,
-              height: 80,
-              borderRadius: 40,
-            }}
-            alt="oops"
-          />
-          <Box sx={styles.editIcon}>
-            <MaterialCommunityIcons
-              name="square-edit-outline"
-              style={{color: colors.white, fontSize: 20}}
-            />
-          </Box>
-        </Box>
+        <Box sx={styles.ImageBox}>{renderAvatar()}</Box>
       </View>
       <View style={styles.squareBox}>
         <HelpBox text={boxContent.help.text} icon={boxContent.help.icon} />
@@ -118,6 +160,12 @@ const Profile: React.FC<DriverProfileScreenProps> = ({navigation}) => {
             Logout
           </Text>
         </Box>
+        <ProfileModal
+          setModalVisible={setModalVisible}
+          modalVisible={modalVisible}
+          openGallery={openGallery}
+          openCamera={openCamera}
+        />
       </View>
     </View>
   );
@@ -128,6 +176,19 @@ export default Profile;
 const styles = StyleSheet.create({
   ImageBox: {
     position: 'relative',
+  },
+  avatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 60,
+    backgroundColor: colors.grey, // Adjust as needed
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarText: {
+    fontSize: 30,
+    color: colors.white,
+    fontWeight: '700',
   },
   editIcon: {
     position: 'absolute',

@@ -11,19 +11,20 @@ export const useUser = () => {
   const updateUserProfile = async (
     userId: string | undefined,
     formData: {
-      firstname: string;
-      lastname: string;
-      email: string;
-      phone: string;
-      password: string;
-      dob: string;
-      username: string;
-      gender: string;
-      userType: string;
+      firstname?: string;
+      lastname?: string;
+      email?: string;
+      phone?: string;
+
+      dob?: string;
+      username?: string;
+      gender?: string;
+      userType?: string;
       vehicleImages?: string[];
       vehicleDocuments?: string[];
       license?: string[];
       cnic?: string[];
+      profile?: string;
     },
   ) => {
     const toastId = toast.show('Updating Profile...', {type: 'normal'});
@@ -37,8 +38,8 @@ export const useUser = () => {
 
       toast.update(toastId, 'Profile Updated Successfully', {type: 'success'});
 
-      console.log('User profile updated:', formData);
-      dispatch(userActions.setUser({...formData}));
+      console.log(formData, 'User profile updated:');
+      dispatch(userActions.setUser(formData));
     } catch (error) {
       toast.update(toastId, 'Profile Update Failed. Please Try Again.', {
         type: 'danger',

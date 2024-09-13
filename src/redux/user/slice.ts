@@ -22,11 +22,11 @@ export type UserSliceType = {
   make?: string;
   registrationNo?: string;
   phone?: string;
-  vehicleImages?: [];
-  vehicleDocuments?: [];
-  license?: [];
-  cnic?: [];
-  profile?: '';
+  vehicleImages?: string[];
+  vehicleDocuments?: string[];
+  license?: string[];
+  cnic?: string[];
+  profile?: string;
 };
 
 export const userSliceIntialState: UserSliceType = {
@@ -49,6 +49,7 @@ export const userSliceIntialState: UserSliceType = {
   company: '',
   make: '',
   registrationNo: '',
+  profile: '',
 };
 
 export const userSlice = createSlice({
