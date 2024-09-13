@@ -5,15 +5,17 @@ import { StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Profile from '../../screens/driver/profile';
-import { HomeDriver } from '../../screens';
+import { DriverRide, HomeDriver } from '../../screens';
 import CustomDriverHeader from '../../components/common/header-driver';
+import { colors } from '../../constant';
+import HeaderDriverOne from '../../components/common/header-driver-one';
 const Tab = createBottomTabNavigator<RootBottomTabParamsDriver>();
 const BottomTab = () => {
     return (
         <Tab.Navigator
             screenOptions={{
-                tabBarInactiveTintColor: config.tokens.colors.primary0,
-                tabBarActiveTintColor: config.tokens.colors.secondary0,
+                tabBarInactiveTintColor: colors.grey,
+                tabBarActiveTintColor: config.tokens.colors.primary0,
                 tabBarStyle: {
                     position: 'absolute',
                     backgroundColor: 'black',
@@ -28,7 +30,7 @@ const BottomTab = () => {
             }}>
             <Tab.Screen
                 options={{
-                    header: () => <CustomDriverHeader />,
+                    header: () => <HeaderDriverOne title={'Home'} />,
                     tabBarLabelStyle: { marginBottom: 10 },
                     tabBarLabel: 'Home',
                     tabBarIcon: ({ color, size }) => (
@@ -40,7 +42,19 @@ const BottomTab = () => {
             />
             <Tab.Screen
                 options={{
-                    header: () => <CustomDriverHeader />,
+                    header: () => <CustomDriverHeader title={'Find Rides'} />,
+                    tabBarLabelStyle: { marginBottom: 10 },
+                    tabBarLabel: 'Ride',
+                    tabBarIcon: ({ color, size }) => (
+                        <MaterialCommunityIcons name="motorbike" color={color} size={35} />
+                    ),
+                }}
+                name="Ride"
+                component={DriverRide}
+            />
+            <Tab.Screen
+                options={{
+                    header: () => <HeaderDriverOne title={'Profile'} />,
                     tabBarLabelStyle: { marginBottom: 10 },
                     tabBarLabel: 'Profile',
                     tabBarIcon: ({ color, size }) => (

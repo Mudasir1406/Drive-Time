@@ -11,9 +11,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import MapView, { Callout, LatLng, Marker } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import getDistance from 'geolib/es/getPreciseDistance';
-
+import { requestCameraPermission } from '../../utils/camera-permission';
 import { colors } from '../../constant';
 import { requestLocationPermission } from '../../utils/camera-permission';
+import { firebase } from '@react-native-firebase/database';
+import database from '@react-native-firebase/database';
+import OfferCard from '../../components/common/offer-card';
 
 type MyObjectType = {
     latitude: number;
@@ -23,7 +26,12 @@ type MyObjectType = {
     photoURL: string;
 };
 
-const Home = () => {
+const reference = firebase
+    .app()
+    .database('https://drive-time-6e9f8-default-rtdb.firebaseio.com/')
+    .ref('/drive-time/example')
+
+const FindRides = () => {
     const [currentLong, setCurrentLong] = useState(0);
     const [currentLat, setCurrentLat] = useState(0);
     const [NearbyHospitals, setNearbyHospitals] = useState<any[]>([]);
@@ -134,15 +142,24 @@ const Home = () => {
         // Open the URL
         Linking.openURL(url);
     };
-
+    const readUserData = () => {
+        database()
+            .ref('/drive-time')
+            .on('value', snapshot => {
+                console.log('User data: ', snapshot.val());
+            });
+    };
     useEffect(() => {
         fetchData();
+
     }, [currentLong, currentLat]);
     useEffect(() => {
         getCurrentLocation();
+        readUserData()
     }, []);
     return (
-        <View>
+        <View style={{ position: "relative" }} >
+            <OfferCard />
             <MapView
                 ref={mapRef}
                 style={{ height: '100%', width: '100%' }}
@@ -188,16 +205,16 @@ const Home = () => {
                         );
                     })}
             </MapView>
-            <TouchableOpacity
+            {/* <TouchableOpacity
                 style={styles.curentLocationBtn}
                 onPress={() => getCurrentLocation()}>
                 <Text style={{ color: colors.white }}>Get Current Location</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
         </View>
     );
 };
 
-export default Home;
+export default FindRides;
 
 const styles = StyleSheet.create({
     curentLocationBtn: {

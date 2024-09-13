@@ -1,5 +1,8 @@
 import {config} from '@gluestack-ui/config';
-import {RootBottomTabParams} from '../../types/types';
+import {
+  BottomTabScreenNavigationProps,
+  RootBottomTabParams,
+} from '../../types/types';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {StyleSheet} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -7,8 +10,9 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Home from '../../screens/user/home';
 import Profile from '../../screens/user/profile';
 import {Header} from '../../components';
+import React from 'react';
 const Tab = createBottomTabNavigator<RootBottomTabParams>();
-const BottomTab = () => {
+const BottomTab: React.FC<BottomTabScreenNavigationProps> = () => {
   return (
     <Tab.Navigator
       screenOptions={{
