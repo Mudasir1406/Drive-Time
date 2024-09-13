@@ -9,11 +9,11 @@ import {
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import MapView, {Callout, LatLng, Marker} from 'react-native-maps';
-import Geolocation from 'react-native-geolocation-service';
 import getDistance from 'geolib/es/getPreciseDistance';
 import {requestCameraPermission} from '../../utils/camera-permission';
 import {colors} from '../../constant';
 import {requestLocationPermission} from '../../utils/camera-permission';
+import Geolocation from '@react-native-community/geolocation';
 
 type MyObjectType = {
   latitude: number;
@@ -32,8 +32,6 @@ const Home = () => {
   const placeType = 'hospital';
   const googleAPIKey = 'AIzaSyCMj4kAhPPoWAT32gMersFx7FkvMEW3560';
   const getCurrentLocation = async () => {
-    const isLocation = await requestLocationPermission();
-    console.log(isLocation);
     Geolocation.getCurrentPosition(
       position => {
         setCurrentLong(position.coords.longitude);
@@ -49,14 +47,12 @@ const Home = () => {
         );
       },
       error => {
-        console.log(error.code, error.message);
+        console.log(error, error);
       },
       {
         enableHighAccuracy: true,
         timeout: 15000,
         maximumAge: 10000,
-        forceRequestLocation: true,
-        forceLocationManager: true,
       },
     );
   };

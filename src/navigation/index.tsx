@@ -9,13 +9,18 @@ import {useEffect} from 'react';
 import auth from '@react-native-firebase/auth';
 import {useAuth} from '../hooks/useAuth';
 import DriverNavigation from './driver-navigation/driver-navigation';
+import {
+  configureGeolocation,
+  requestLocationPermission,
+} from '../utils/camera-permission';
 const AppContanier = () => {
   const {getUserById} = useAuth();
   const dispatch = useDispatch<StoreDispatch>();
   const userData = useSelector((state: StoreState) => state.user);
+  const getPermissions = async () => {
+    const isLocation = await requestLocationPermission();
+  };
   async function onAuthStateChanged(user: any) {
-    console.log(user, 'dfsjkfk');
-
     if (user) {
       const data = await getUserById(user.uid);
       dispatch(
@@ -31,6 +36,8 @@ const AppContanier = () => {
   }
 
   useEffect(() => {
+    configureGeolocation();
+    getPermissions();
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
     return subscriber;
   }, []);

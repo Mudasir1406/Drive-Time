@@ -1,16 +1,23 @@
-import { StyleSheet, Text, View } from 'react-native';
+import {StyleProp, StyleSheet, Text, View, ViewStyle} from 'react-native';
 import React from 'react';
-import { Box, Button, ButtonText } from '@gluestack-ui/themed';
-import { colors } from '../../constant';
+import {Box, Button, ButtonText} from '@gluestack-ui/themed';
+import {colors} from '../../constant';
+import {SxProps} from '@gluestack-style/react/lib/typescript/types';
 type IProps = {
   text: string;
   handlePress: () => void;
+  contanierStyles?: Partial<SxProps<StyleProp<ViewStyle>>>;
 };
-const CustomButton: React.FC<IProps> = ({ text, handlePress }) => {
+const CustomButton: React.FC<IProps> = ({
+  text,
+  handlePress,
+  contanierStyles,
+}) => {
   return (
-    <Box>
+    <Box sx={contanierStyles}>
       <Button onPress={handlePress} sx={styles.btn}>
-        <ButtonText sx={{ width: '100%', textAlign: 'center', color: colors.white }}>
+        <ButtonText
+          sx={{width: '100%', textAlign: 'center', color: colors.white}}>
           {text}
         </ButtonText>
       </Button>
@@ -29,7 +36,7 @@ const styles = StyleSheet.create({
 
     backgroundColor: 'black',
     width: '100%',
-    justifyContent: "center",
-    alignItems: "center"
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
