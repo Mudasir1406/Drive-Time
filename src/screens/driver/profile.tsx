@@ -14,6 +14,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import ProfileModal from '../../components/common/profile-image-modal';
 import {uploadImage} from '../../services/storage-service/StorageService';
 import {useUser} from '../../hooks/useUser';
+import {useAuth} from '../../hooks/useAuth';
 
 interface HelpBoxProps {
   text: string;
@@ -33,6 +34,7 @@ const Profile: React.FC<DriverProfileScreenProps> = ({navigation}) => {
   const userData = useSelector((state: StoreState) => state.user);
   console.log(userData, 'userDa');
   const {updateUserProfile} = useUser();
+  const {logOut} = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
   const openCamera = async () => {
     const test = await requestCameraPermission();
@@ -156,9 +158,12 @@ const Profile: React.FC<DriverProfileScreenProps> = ({navigation}) => {
             name="logout"
             style={{color: colors.black, fontSize: 25}}
           />
-          <Text style={{color: colors.black, fontSize: 19, fontWeight: '600'}}>
-            Logout
-          </Text>
+          <Pressable onPress={() => logOut()}>
+            <Text
+              style={{color: colors.black, fontSize: 19, fontWeight: '600'}}>
+              Logout
+            </Text>
+          </Pressable>
         </Box>
         <ProfileModal
           setModalVisible={setModalVisible}
