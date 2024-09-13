@@ -6,6 +6,10 @@ import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete'
 import CustomButton from '../../components/login-types/custom-button';
 import axios from 'axios';
 import Geolocation from '@react-native-community/geolocation';
+import database from '@react-native-firebase/database';
+import {useSelector} from 'react-redux';
+import {StoreState} from '../../redux/reduxStore';
+import {Timestamp} from '@react-native-firebase/firestore';
 
 const {width, height} = Dimensions.get('window');
 
@@ -23,6 +27,7 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
   const [locationStage, setLocationStage] = useState<
     'pickup' | 'dropoff' | 'none'
   >('pickup');
+  const userData = useSelector((state: StoreState) => state.user);
   const mapRef = useRef<MapView>(null);
   const currentPosition = () => {
     Geolocation.getCurrentPosition(
@@ -153,6 +158,20 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
       setDropoffLocation({latitude, longitude});
     }
   };
+  const findRides = () => {
+    console.log(userData.uid, 'uid');
+    database()
+      .ref('/drive-time/rides/' + userData.uid)
+      .set({
+        pickupLocation,
+        dropoffLocation,
+        distance,
+        dateTime: Timestamp.now(),
+        price: Number(distance.slice(0, -2)) * 20,
+        status: 'Offer',
+      })
+      .then(() => console.log('Data set.'));
+  };
   useEffect(() => {
     if (pickupLocation && !dropoffLocation) {
       mapRef.current?.animateToRegion(
@@ -271,8 +290,8 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
       )}
       {locationStage === 'none' && (
         <CustomButton
-          text="Make Offer"
-          handlePress={calculateRoute}
+          text="Find Ride"
+          handlePress={findRides}
           contanierStyles={styles.confirmLocation}
         />
       )}
