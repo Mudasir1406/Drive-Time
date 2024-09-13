@@ -1,7 +1,7 @@
 import {Platform} from 'react-native';
 import {request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import {PermissionsAndroid} from 'react-native';
-import Geolocation from 'react-native-geolocation-service';
+import Geolocation from '@react-native-community/geolocation';
 
 export const requestCameraPermission = async () => {
   try {
@@ -48,11 +48,7 @@ export const requestLocationPermission = async () => {
       );
       return granted === PermissionsAndroid.RESULTS.GRANTED;
     } else if (Platform.OS === 'ios') {
-      const permissionStatus = await Geolocation.requestAuthorization(
-        'whenInUse',
-      );
-      console.log(permissionStatus);
-      return permissionStatus === RESULTS.GRANTED;
+      return requestLocationAuthorization();
     } else {
       return false; // Unsupported platform
     }
@@ -60,4 +56,42 @@ export const requestLocationPermission = async () => {
     console.log(err);
     return false;
   }
+};
+
+const requestLocationAuthorization = async () => {
+  let result = false;
+  Geolocation.requestAuthorization(
+    () => {
+      result = true;
+      // Success callback: Location permission granted
+      console.log('Location permission granted.');
+    },
+    error => {
+      result = false;
+      // Error callback: Handle permission errors here
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          console.log('Permission denied. Message: ', error.message);
+          break;
+        case error.POSITION_UNAVAILABLE:
+          console.log('Position unavailable. Message: ', error.message);
+          break;
+        case error.TIMEOUT:
+          console.log('Request timeout. Message: ', error.message);
+          break;
+        default:
+          console.log('Unknown error: ', error.message);
+      }
+    },
+  );
+  return result;
+};
+
+export const configureGeolocation = () => {
+  Geolocation.setRNConfiguration({
+    skipPermissionRequests: false, // You can set to true if handling permissions manually
+    authorizationLevel: 'whenInUse', // Options: 'always', 'whenInUse', 'auto'
+    enableBackgroundLocationUpdates: false, // Set to true if you need background location updates (iOS-only)
+    locationProvider: 'auto', // Options: 'playServices', 'android', 'auto' (Android-only)
+  });
 };
