@@ -17,7 +17,6 @@ export const useAuth = () => {
     vehicleImages?: string[];
     vehicleDocuments?: string[];
     license?: string[];
-    cnic?: string[];
   }) => {
     const {firstname, email, password} = formData;
 
