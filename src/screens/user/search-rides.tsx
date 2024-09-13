@@ -1,11 +1,15 @@
 import {Alert, Dimensions, StyleSheet, Text, View} from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {SearchRidesScreenNavigationProps} from '../../types/types';
 import MapView, {Marker, Polyline, Region} from 'react-native-maps';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import CustomButton from '../../components/login-types/custom-button';
-import Geolocation from 'react-native-geolocation-service';
 import axios from 'axios';
+import Geolocation from '@react-native-community/geolocation';
+import database from '@react-native-firebase/database';
+import {useSelector} from 'react-redux';
+import {StoreState} from '../../redux/reduxStore';
+import {Timestamp} from '@react-native-firebase/firestore';
 
 const {width, height} = Dimensions.get('window');
 
@@ -20,22 +24,62 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
   const [dropoffLocation, setDropoffLocation] = useState<any>(null);
   const [routeCoords, setRouteCoords] = useState<any[]>([]);
   const [distance, setDistance] = useState<string>('');
-  const [locationStage, setLocationStage] = useState<'pickup' | 'dropoff'>(
-    'pickup',
-  );
-
-  useEffect(() => {
-    // Request user's location when component mounts
+  const [locationStage, setLocationStage] = useState<
+    'pickup' | 'dropoff' | 'none'
+  >('pickup');
+  const userData = useSelector((state: StoreState) => state.user);
+  const mapRef = useRef<MapView>(null);
+  const currentPosition = () => {
     Geolocation.getCurrentPosition(
       position => {
         const {latitude, longitude} = position.coords;
         setPickupLocation({latitude, longitude});
+        mapRef.current?.animateToRegion(
+          {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            latitudeDelta: 0.005,
+            longitudeDelta: 0.005,
+          },
+          2000,
+        );
+        setLocationStage('dropoff');
       },
       error => {
         Alert.alert('Error', 'Unable to fetch location');
       },
-      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+      },
     );
+  };
+  useEffect(() => {
+    Geolocation.getCurrentPosition(
+      position => {
+        const {latitude, longitude} = position.coords;
+        setPickupLocation({latitude, longitude});
+        mapRef.current?.animateToRegion(
+          {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            latitudeDelta: 0.005,
+            longitudeDelta: 0.005,
+          },
+          2000,
+        );
+      },
+      error => {
+        Alert.alert('Error', 'Unable to fetch location');
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+      },
+    );
+    // Request user's location when component mounts
   }, []);
 
   const calculateRoute = async () => {
@@ -52,6 +96,16 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
         // Get the distance from the API response
         const routeDistance = response.data.routes[0].legs[0].distance.text;
         setDistance(routeDistance);
+        mapRef.current?.fitToCoordinates([pickupLocation, dropoffLocation], {
+          edgePadding: {
+            top: 50,
+            right: 50,
+            bottom: 50,
+            left: 50,
+          },
+          animated: true,
+        });
+        setLocationStage('none');
       } catch (error) {
         console.error('Error fetching directions: ', error);
       }
@@ -104,13 +158,53 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
       setDropoffLocation({latitude, longitude});
     }
   };
-
+  const findRides = () => {
+    console.log(userData.uid, 'uid');
+    database()
+      .ref('/drive-time/rides/' + userData.uid)
+      .set({
+        pickupLocation,
+        dropoffLocation,
+        distance,
+        dateTime: Timestamp.now(),
+        price: Number(distance.slice(0, -2)) * 20,
+        status: 'Offer',
+      })
+      .then(() => console.log('Data set.'));
+  };
+  useEffect(() => {
+    if (pickupLocation && !dropoffLocation) {
+      mapRef.current?.animateToRegion(
+        {
+          latitude: pickupLocation.latitude,
+          longitude: pickupLocation.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        },
+        2000,
+      );
+    } else if (pickupLocation && dropoffLocation) {
+      mapRef.current?.fitToCoordinates([pickupLocation, dropoffLocation], {
+        edgePadding: {
+          top: 50,
+          right: 50,
+          bottom: 50,
+          left: 50,
+        },
+        animated: true,
+      });
+    }
+  }, [pickupLocation, dropoffLocation]);
   return (
     <View style={styles.container}>
       {/* MapView */}
       <MapView
+        ref={mapRef}
         style={styles.map}
         onPress={handleMapPress}
+        showsUserLocation
+        userLocationPriority="high"
+        showsMyLocationButton
         initialRegion={{
           latitude: pickupLocation ? pickupLocation.latitude : 37.78825,
           longitude: pickupLocation ? pickupLocation.longitude : -122.4324,
@@ -187,14 +281,35 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
       )}
 
       {/* Confirm Button */}
-      {pickupLocation && dropoffLocation && (
-        <CustomButton text="Confirm Locations" handlePress={calculateRoute} />
+      {pickupLocation && dropoffLocation && locationStage !== 'none' && (
+        <CustomButton
+          text="Confirm Locations"
+          handlePress={calculateRoute}
+          contanierStyles={styles.confirmLocation}
+        />
+      )}
+      {locationStage === 'none' && (
+        <CustomButton
+          text="Find Ride"
+          handlePress={findRides}
+          contanierStyles={styles.confirmLocation}
+        />
+      )}
+      {locationStage === 'pickup' && (
+        <CustomButton
+          text="Current Location"
+          handlePress={currentPosition}
+          contanierStyles={styles.confirmLocation}
+        />
       )}
 
       {/* Distance Display */}
       <View style={styles.distanceContainer}>
         {distance ? (
-          <Text>Distance: {distance}</Text>
+          <Text>
+            Distance: {distance} Estimated Price: $
+            {Number(distance.slice(0, -2)) * 20}
+          </Text>
         ) : (
           <Text>Select locations to calculate route</Text>
         )}
@@ -239,5 +354,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 2,
     elevation: 5,
+  },
+  confirmLocation: {
+    bottom: 100,
+    position: 'absolute',
+    width: '90%',
+    alignSelf: 'center',
   },
 });

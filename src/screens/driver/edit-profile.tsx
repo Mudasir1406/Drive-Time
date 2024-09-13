@@ -59,7 +59,6 @@ const EditProfile: React.FC<DriverEditProfileScreenProps> = ({navigation}) => {
         height: 400,
         cropping: true,
       }).then(image => {
-        console.log(image);
         uploadImage(image.path).then(url => {
           if (url && selectedImageCatgeory) {
             setvalues(prevValues => ({

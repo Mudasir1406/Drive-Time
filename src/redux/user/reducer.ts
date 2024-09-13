@@ -33,6 +33,7 @@ export const setUser = (state: stateType, action: actionType) => {
   state.isLoggedIn = isLoggedIn !== undefined ? isLoggedIn : state.isLoggedIn;
   state.gender = gender !== undefined ? gender : state.gender;
   state.lastname = lastname !== undefined ? lastname : state.lastname;
+  state.uid = uid !== undefined ? uid : state.uid;
   state.username = username !== undefined ? username : state.username;
   state.userType = userType ? userType : state.userType;
   state.profile = profile ? profile : state.profile;

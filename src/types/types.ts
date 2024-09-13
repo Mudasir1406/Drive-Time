@@ -49,6 +49,7 @@ export type RootBottomTabParams = {
 };
 export type RootBottomTabParamsDriver = {
   Home: undefined;
+  Ride: undefined;
   Profile: undefined;
 };
 
@@ -85,19 +86,19 @@ export type DriverProfileScreenProps = CompositeScreenProps<
   NativeStackScreenProps<DriverStackParamList>
 >;
 
-export type DriverEditProfileScreenProps = CompositeScreenProps<
-  BottomTabScreenProps<RootBottomTabParamsDriver>,
-  NativeStackScreenProps<DriverStackParamList, 'EditProfile'>
->;
-export type UserEditProfileScreenProps = CompositeScreenProps<
-  BottomTabScreenProps<RootBottomTabParams>,
-  NativeStackScreenProps<UserStackParamList, 'EditProfile'>
->;
-// export type DriverEditProfileScreenProps = NativeStackScreenProps<
-//   DriverStackParamList,
-//   'EditProfile'
+// export type DriverEditProfileScreenProps = CompositeScreenProps<
+//   BottomTabScreenProps<RootBottomTabParamsDriver>,
+//   NativeStackScreenProps<DriverStackParamList, 'EditProfile'>
 // >;
-// export type UserEditProfileScreenProps = NativeStackScreenProps<
-//   UserStackParamList,
-//   'EditProfile'
+// export type UserEditProfileScreenProps = CompositeScreenProps<
+//   BottomTabScreenProps<RootBottomTabParams>,
+//   NativeStackScreenProps<UserStackParamList, 'EditProfile'>
 // >;
+export type DriverEditProfileScreenProps = NativeStackScreenProps<
+  DriverStackParamList,
+  'EditProfile'
+>;
+export type UserEditProfileScreenProps = NativeStackScreenProps<
+  UserStackParamList,
+  'EditProfile'
+>;

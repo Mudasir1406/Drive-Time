@@ -9,11 +9,14 @@ import {
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import MapView, {Callout, LatLng, Marker} from 'react-native-maps';
-import Geolocation from 'react-native-geolocation-service';
 import getDistance from 'geolib/es/getPreciseDistance';
 import {requestCameraPermission} from '../../utils/camera-permission';
 import {colors} from '../../constant';
 import {requestLocationPermission} from '../../utils/camera-permission';
+import {firebase} from '@react-native-firebase/database';
+import database from '@react-native-firebase/database';
+import OfferCard from '../../components/common/offer-card';
+import Geolocation from '@react-native-community/geolocation';
 
 type MyObjectType = {
   latitude: number;
@@ -23,7 +26,7 @@ type MyObjectType = {
   photoURL: string;
 };
 
-const Home = () => {
+const FindRides = () => {
   const [currentLong, setCurrentLong] = useState(0);
   const [currentLat, setCurrentLat] = useState(0);
   const [NearbyHospitals, setNearbyHospitals] = useState<any[]>([]);
@@ -32,8 +35,6 @@ const Home = () => {
   const placeType = 'hospital';
   const googleAPIKey = 'AIzaSyCMj4kAhPPoWAT32gMersFx7FkvMEW3560';
   const getCurrentLocation = async () => {
-    const isLocation = await requestLocationPermission();
-    console.log(isLocation);
     Geolocation.getCurrentPosition(
       position => {
         setCurrentLong(position.coords.longitude);
@@ -49,14 +50,12 @@ const Home = () => {
         );
       },
       error => {
-        console.log(error.code, error.message);
+        console.log(error, error);
       },
       {
         enableHighAccuracy: true,
         timeout: 15000,
         maximumAge: 10000,
-        forceRequestLocation: true,
-        forceLocationManager: true,
       },
     );
   };
@@ -72,61 +71,7 @@ const Home = () => {
     }
     return 0;
   };
-  const fetchData = async () => {
-    const url =
-      'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' +
-      currentLat +
-      ',' +
-      currentLong +
-      '&radius=5000' +
-      '&type=' +
-      placeType +
-      '&key=' +
-      googleAPIKey;
-    try {
-      const data = await fetch(url);
-      const resp = await data.json();
 
-      if (resp && resp.results) {
-        const coords: LatLng[] = [];
-        let temp = [];
-        for (let item = 0; item < resp.results.length; item++) {
-          coords.push({
-            latitude: resp.results[item].geometry.location.lat,
-            longitude: resp.results[item].geometry.location.lng,
-          });
-          const distance = calculateDistance({
-            latitude: resp.results[item].geometry.location.lat,
-            longitude: resp.results[item].geometry.location.lng,
-          });
-
-          let obj = {
-            latitude: resp.results[item].geometry.location.lat,
-            longitude: resp.results[item].geometry.location.lng,
-            title: resp.results[item].name,
-            distance: distance,
-            photoURL: resp.results[item].icon,
-          };
-          temp.push(obj);
-        }
-        setMarkers(temp);
-        setNearbyHospitals(resp.results);
-        if (coords.length) {
-          mapRef.current?.fitToCoordinates(coords, {
-            edgePadding: {
-              top: 50,
-              bottom: 50,
-              left: 50,
-              right: 50,
-            },
-            animated: true,
-          });
-        }
-      }
-    } catch (e) {
-      console.log(e, 'error');
-    }
-  };
   const openGoogleMaps = (lat: number, lng: number, label?: string) => {
     // Construct the URL
     const url = `geo:${lat},${lng}?q=${lat},${lng}(${label})`;
@@ -134,15 +79,21 @@ const Home = () => {
     // Open the URL
     Linking.openURL(url);
   };
+  const readUserData = () => {
+    database()
+      .ref('/drive-time')
+      .on('value', snapshot => {
+        console.log('User data: ', snapshot.val());
+      });
+  };
 
   useEffect(() => {
-    fetchData();
-  }, [currentLong, currentLat]);
-  useEffect(() => {
     getCurrentLocation();
+    readUserData();
   }, []);
   return (
-    <View>
+    <View style={{position: 'relative'}}>
+      <OfferCard />
       <MapView
         ref={mapRef}
         style={{height: '100%', width: '100%'}}
@@ -188,16 +139,16 @@ const Home = () => {
             );
           })}
       </MapView>
-      <TouchableOpacity
-        style={styles.curentLocationBtn}
-        onPress={() => getCurrentLocation()}>
-        <Text style={{color: colors.white}}>Get Current Location</Text>
-      </TouchableOpacity>
+      {/* <TouchableOpacity
+                style={styles.curentLocationBtn}
+                onPress={() => getCurrentLocation()}>
+                <Text style={{ color: colors.white }}>Get Current Location</Text>
+            </TouchableOpacity> */}
     </View>
   );
 };
 
-export default Home;
+export default FindRides;
 
 const styles = StyleSheet.create({
   curentLocationBtn: {

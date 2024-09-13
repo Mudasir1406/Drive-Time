@@ -34,7 +34,6 @@ const Profile: React.FC<DriverProfileScreenProps> = ({navigation}) => {
   const userData = useSelector((state: StoreState) => state.user);
   console.log(userData, 'userDa');
   const {updateUserProfile} = useUser();
-  const {logOut} = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
   const openCamera = async () => {
     const test = await requestCameraPermission();
@@ -121,7 +120,7 @@ const Profile: React.FC<DriverProfileScreenProps> = ({navigation}) => {
           justifyContent: 'space-between',
         }}>
         <Box>
-          <Text style={{fontSize: 25, fontWeight: '700'}}>Profile</Text>
+          {/* <Text style={{fontSize: 25, fontWeight: '700'}}>Profile</Text> */}
           <Text style={{fontSize: 30, color: colors.black, fontWeight: '700'}}>
             Welcome, {userData?.lastname}
           </Text>
@@ -158,12 +157,9 @@ const Profile: React.FC<DriverProfileScreenProps> = ({navigation}) => {
             name="logout"
             style={{color: colors.black, fontSize: 25}}
           />
-          <Pressable onPress={() => logOut()}>
-            <Text
-              style={{color: colors.black, fontSize: 19, fontWeight: '600'}}>
-              Logout
-            </Text>
-          </Pressable>
+          <Text style={{color: colors.black, fontSize: 19, fontWeight: '600'}}>
+            Logout
+          </Text>
         </Box>
         <ProfileModal
           setModalVisible={setModalVisible}
