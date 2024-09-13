@@ -49,6 +49,7 @@ export type RootBottomTabParams = {
 };
 export type RootBottomTabParamsDriver = {
   Home: undefined;
+  Ride: undefined;
   Profile: undefined;
 };
 
