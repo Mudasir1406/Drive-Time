@@ -19,6 +19,10 @@ export type LoginTypeNavigation = NativeStackScreenProps<
   AuthStackParamList,
   'LoginType'
 >;
+export type forgetScreenNavigationProps = NativeStackScreenProps<
+  AuthStackParamList,
+  'forgetPassword'
+>;
 export type loginScreenNavigationProps = NativeStackScreenProps<
   AuthStackParamList,
   'Login'
@@ -51,6 +55,7 @@ export type RootBottomTabParamsDriver = {
 export type UserStackParamList = {
   BottomTab: NavigatorScreenParams<RootBottomTabParams>;
   SearchRides: undefined;
+  EditProfile: undefined;
 };
 
 export type SearchRidesScreenNavigationProps = NativeStackScreenProps<
@@ -63,6 +68,7 @@ export type BottomTabScreenNavigationProps = NativeStackScreenProps<
 >;
 export type DriverStackParamList = {
   BottomTab: NavigatorScreenParams<RootBottomTabParamsDriver>;
+  EditProfile: undefined;
 };
 
 export type HomeScreenProps = CompositeScreenProps<
@@ -72,4 +78,17 @@ export type HomeScreenProps = CompositeScreenProps<
 export type ProfileScreenProps = CompositeScreenProps<
   BottomTabScreenProps<RootBottomTabParams, 'Profile'>,
   NativeStackScreenProps<UserStackParamList>
+>;
+
+export type DriverProfileScreenProps = CompositeScreenProps<
+  BottomTabScreenProps<RootBottomTabParamsDriver, 'Profile'>,
+  NativeStackScreenProps<DriverStackParamList>
+>;
+export type DriverEditProfileScreenProps = NativeStackScreenProps<
+  DriverStackParamList,
+  'EditProfile'
+>;
+export type UserEditProfileScreenProps = NativeStackScreenProps<
+  UserStackParamList,
+  'EditProfile'
 >;

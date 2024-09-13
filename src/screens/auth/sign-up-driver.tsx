@@ -1,17 +1,17 @@
-import {Pressable, StyleSheet} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {Box, Image, ScrollView} from '@gluestack-ui/themed';
-import {Text} from '@gluestack-ui/themed';
-import {colors} from '../../constant';
+import { Pressable, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Box, Image, ScrollView } from '@gluestack-ui/themed';
+import { Text } from '@gluestack-ui/themed';
+import { colors } from '../../constant';
 import UploadImage from '../../components/signup-driver/upload-image';
-import {requestCameraPermission} from '../../utils/camera-permission';
+import { requestCameraPermission } from '../../utils/camera-permission';
 import ImagePicker from 'react-native-image-crop-picker';
-import {Toast} from 'react-native-toast-notifications';
-import {uploadImage} from '../../services/storage-service/StorageService';
+import { Toast } from 'react-native-toast-notifications';
+import { uploadImage } from '../../services/storage-service/StorageService';
 import CameraModal from '../../components/common/camera-modal';
 import DriverSignUpForm from '../../components/signup-driver/driver-signup-form';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {useAuth} from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth';
 import CustomButton from '../../components/login-types/custom-button';
 import {
   loginScreenNavigationProps,
@@ -22,13 +22,12 @@ const SignUpDriver: React.FC<signupdriverScreenNavigationProps> = ({
   navigation,
   route,
 }) => {
-  const {signup} = useAuth();
+  const { signup } = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
   const [personalInfo, setpersonalInfo] = useState(false);
   const [vehicleImages, setvehicleImages] = useState<string[]>([]);
   const [vehicleDocuments, setvehicleDocuments] = useState<string[]>([]);
   const [license, setLisence] = useState<string[]>([]);
-  const [cnic, setCnic] = useState<string[]>([]);
   const [currentImageType, setcurrentImageType] = useState<string>();
   const [PersonalData, setPersonalData] = useState({
     username: '',
@@ -55,8 +54,6 @@ const SignUpDriver: React.FC<signupdriverScreenNavigationProps> = ({
       );
     } else if (currentImageType === 'lisence') {
       setLisence(prev => (Array.isArray(prev) ? [...prev, url] : [url]));
-    } else if (currentImageType === 'cnic') {
-      setCnic(prev => (Array.isArray(prev) ? [...prev, url] : [url]));
     }
   };
 
@@ -117,7 +114,6 @@ const SignUpDriver: React.FC<signupdriverScreenNavigationProps> = ({
       vehicleImages: vehicleImages,
       vehicleDocuments: vehicleDocuments,
       license: license,
-      cnic: cnic,
     });
   };
 
@@ -129,8 +125,8 @@ const SignUpDriver: React.FC<signupdriverScreenNavigationProps> = ({
             onPress={() => {
               setpersonalInfo(false);
             }}
-            style={{width: '100%'}}>
-            <Ionicons name="arrow-back-circle-sharp" style={{fontSize: 30}} />
+            style={{ width: '100%' }}>
+            <Ionicons name="arrow-back-circle-sharp" style={{ fontSize: 30 }} />
           </Pressable>
           <Text sx={styles.heading}>Driver's Information</Text>
           {vehicleImages?.length < 5 && (
@@ -147,9 +143,9 @@ const SignUpDriver: React.FC<signupdriverScreenNavigationProps> = ({
                 return (
                   <Image
                     alt="oops"
-                    source={{uri: data}}
+                    source={{ uri: data }}
                     key={index}
-                    sx={{width: 100, height: 100, borderRadius: 10, margin: 10}}
+                    sx={{ width: 100, height: 100, borderRadius: 10, margin: 10 }}
                   />
                 );
               })}
@@ -169,9 +165,9 @@ const SignUpDriver: React.FC<signupdriverScreenNavigationProps> = ({
                 return (
                   <Image
                     alt="oops"
-                    source={{uri: data}}
+                    source={{ uri: data }}
                     key={index}
-                    sx={{width: 100, height: 100, borderRadius: 10}}
+                    sx={{ width: 100, height: 100, borderRadius: 10 }}
                   />
                 );
               })}
@@ -191,36 +187,15 @@ const SignUpDriver: React.FC<signupdriverScreenNavigationProps> = ({
                 return (
                   <Image
                     alt="oops"
-                    source={{uri: data}}
+                    source={{ uri: data }}
                     key={index}
-                    sx={{width: 100, height: 100, borderRadius: 10, margin: 10}}
+                    sx={{ width: 100, height: 100, borderRadius: 10, margin: 10 }}
                   />
                 );
               })}
             </Box>
           )}
-          {cnic?.length < 3 && (
-            <UploadImage
-              heading="Upload CNIC (front/back)"
-              onPress={() => {
-                openModal('cnic');
-              }}
-            />
-          )}
-          {cnic && cnic?.length > 0 && (
-            <Box sx={styles.imageWrapper}>
-              {cnic.map((data, index) => {
-                return (
-                  <Image
-                    alt="oops"
-                    source={{uri: data}}
-                    key={index}
-                    sx={{width: 100, height: 100, borderRadius: 10, margin: 10}}
-                  />
-                );
-              })}
-            </Box>
-          )}
+
           <Box sx={styles.submitButtonContainer}>
             <CustomButton text="Sign up" handlePress={SubmitDriverSignUp} />
           </Box>

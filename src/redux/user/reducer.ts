@@ -17,7 +17,6 @@ export const setUser = (state: stateType, action: actionType) => {
     uid,
     VehicleNo,
     VehicleType,
-    cnic,
     company,
     license,
     make,
@@ -42,7 +41,6 @@ export const setUser = (state: stateType, action: actionType) => {
   state.company = company ? company : state.company;
   state.make = make ? make : state.make;
   state.registrationNo = registrationNo ? registrationNo : state.registrationNo;
-  state.cnic = cnic ? cnic : state.cnic;
   state.license = license ? license : state.license;
   state.vehicleDocuments = vehicleDocuments
     ? vehicleDocuments

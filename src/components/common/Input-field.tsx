@@ -1,7 +1,7 @@
-import {StyleSheet, Text, View, TextInput} from 'react-native';
+import { StyleSheet, Text, View, TextInput } from 'react-native';
 import React from 'react';
-import {useField} from 'formik';
-import {colors} from '../../constant';
+import { useField } from 'formik';
+import { colors } from '../../constant';
 
 interface CustomInputProps {
   label?: string;
@@ -29,7 +29,7 @@ const CustomInput = ({
         onChangeText={field.onChange(name)}
         onBlur={field.onBlur(name)}
         value={field.value}
-        secureTextEntry={secureTextEntry} // Add secureTextEntry for password input
+        secureTextEntry={secureTextEntry}
         {...props}
       />
       {meta.error && meta.touched ? (

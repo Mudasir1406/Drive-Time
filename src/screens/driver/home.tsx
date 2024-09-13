@@ -13,6 +13,7 @@ import Geolocation from 'react-native-geolocation-service';
 import getDistance from 'geolib/es/getPreciseDistance';
 import {requestCameraPermission} from '../../utils/camera-permission';
 import {colors} from '../../constant';
+import {requestLocationPermission} from '../../utils/camera-permission';
 
 type MyObjectType = {
   latitude: number;
@@ -31,7 +32,7 @@ const Home = () => {
   const placeType = 'hospital';
   const googleAPIKey = 'AIzaSyCMj4kAhPPoWAT32gMersFx7FkvMEW3560';
   const getCurrentLocation = async () => {
-    const isLocation = await requestCameraPermission();
+    const isLocation = await requestLocationPermission();
     console.log(isLocation);
     Geolocation.getCurrentPosition(
       position => {

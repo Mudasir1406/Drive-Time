@@ -9,9 +9,6 @@ import {LoginTypeNavigation} from '../../types/types';
 import {StoreDispatch} from '../../redux/reduxStore';
 import {userActions} from '../../redux/user/slice';
 import LogoSection from '../../components/common/logo-section';
-type IProps = {
-  navigation: LoginTypeNavigation;
-};
 
 const LoginTypes: React.FunctionComponent<LoginTypeNavigation> = ({
   navigation,
