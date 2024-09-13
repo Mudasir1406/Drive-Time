@@ -3,6 +3,7 @@ import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {UserStackParamList} from '../../types/types';
 import BottomTab from './botton-tab-navigation';
+import {SearchRides} from '../../screens';
 import EditProfile from '../../screens/user/edit-profile';
 
 const RootStack = createNativeStackNavigator<UserStackParamList>();
@@ -24,6 +25,7 @@ const UserNavigation = () => {
         animationDuration: 300,
       }}>
       <RootStack.Screen name="BottomTab" component={BottomTab} />
+      <RootStack.Screen name="SearchRides" component={SearchRides} />
       <RootStack.Screen
         name="EditProfile"
         component={EditProfile}

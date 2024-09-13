@@ -54,8 +54,18 @@ export type RootBottomTabParamsDriver = {
 
 export type UserStackParamList = {
   BottomTab: NavigatorScreenParams<RootBottomTabParams>;
+  SearchRides: undefined;
   EditProfile: undefined;
 };
+
+export type SearchRidesScreenNavigationProps = NativeStackScreenProps<
+  UserStackParamList,
+  'SearchRides'
+>;
+export type BottomTabScreenNavigationProps = NativeStackScreenProps<
+  UserStackParamList,
+  'BottomTab'
+>;
 export type DriverStackParamList = {
   BottomTab: NavigatorScreenParams<RootBottomTabParamsDriver>;
   EditProfile: undefined;

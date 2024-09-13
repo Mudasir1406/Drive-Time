@@ -25,8 +25,9 @@ export type UserSliceType = {
   vehicleImages?: string[];
   vehicleDocuments?: string[];
   license?: string[];
-  cnic?: string[];
+
   profile?: string;
+  password?: string;
 };
 
 export const userSliceIntialState: UserSliceType = {
@@ -42,13 +43,13 @@ export const userSliceIntialState: UserSliceType = {
   vehicleImages: [],
   vehicleDocuments: [],
   license: [],
-  cnic: [],
   phone: '',
   VehicleNo: '',
   VehicleType: '',
   company: '',
   make: '',
   registrationNo: '',
+  password: '',
   profile: '',
 };
 
