@@ -25,7 +25,6 @@ export type UserSliceType = {
   vehicleImages?: string[];
   vehicleDocuments?: string[];
   license?: string[];
-
   profile?: string;
   password?: string;
 };

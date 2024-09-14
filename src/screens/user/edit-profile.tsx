@@ -33,6 +33,7 @@ import {useUser} from '../../hooks/useUser';
 const EditProfile: React.FC<UserEditProfileScreenProps> = ({navigation}) => {
   const {updateUserProfile} = useUser();
   const userData = useSelector((state: StoreState) => state.user);
+
   console.log(userData, 'user');
   return (
     <Formik
