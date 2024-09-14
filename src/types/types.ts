@@ -1,3 +1,4 @@
+import {Timestamp} from '@react-native-firebase/firestore';
 import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 import {
   CompositeScreenProps,
@@ -93,3 +94,17 @@ export type UserEditProfileScreenProps = NativeStackScreenProps<
   UserStackParamList,
   'EditProfile'
 >;
+export type MyObjectType = {
+  price: number;
+  status: string;
+  uid: string;
+  dropoffLocation: {
+    latitude: number;
+    longitude: number;
+  };
+  pickupLocation: {
+    latitude: number;
+    longitude: number;
+  };
+  dateTime: Timestamp;
+};

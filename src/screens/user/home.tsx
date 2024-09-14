@@ -1,5 +1,5 @@
 import {StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {HomeScreenProps} from '../../types/types';
 import Block from '../../components/common/block';
 import {useSelector} from 'react-redux';
@@ -7,9 +7,13 @@ import {StoreState} from '../../redux/reduxStore';
 import {BannerCarousel, RideBox} from '../../components';
 import {HStack} from '@gluestack-ui/themed';
 import {images} from '../../constant';
+import {getRides} from '../../services/firebase-realtime/rides-services';
 
 const Home: React.FC<HomeScreenProps> = ({navigation}) => {
   const userData = useSelector((state: StoreState) => state.user);
+  useEffect(() => {
+    getRides();
+  }, []);
   return (
     <Block
       paddingBottom={400}
