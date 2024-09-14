@@ -13,7 +13,8 @@ import {
   configureGeolocation,
   requestLocationPermission,
 } from '../utils/camera-permission';
-import {ActivityIndicator, View, Text} from 'react-native'; // Import loading indicator
+import {ActivityIndicator, View, Text, Image} from 'react-native'; // Import loading indicator
+import {images} from '../constant';
 
 const AppContanier = () => {
   const {getUserById} = useAuth();
@@ -36,6 +37,7 @@ const AppContanier = () => {
           uid: user.uid,
         }),
       );
+      setLoading(false);
     } else {
       dispatch(userActions.setUser(userSliceIntialState));
     }
@@ -46,19 +48,17 @@ const AppContanier = () => {
     getPermissions();
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
 
-    const timer = setTimeout(() => setLoading(false), 3000);
-
     return () => {
       subscriber();
-      clearTimeout(timer);
     };
   }, []);
 
   if (loading) {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Loading...</Text>
+        <Image
+          source={{uri: images.logo}}
+          style={{height: 200, width: 200}}></Image>
       </View>
     );
   }
