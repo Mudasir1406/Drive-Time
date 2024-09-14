@@ -11,9 +11,7 @@ import {getRides} from '../../services/firebase-realtime/rides-services';
 
 const Home: React.FC<HomeScreenProps> = ({navigation}) => {
   const userData = useSelector((state: StoreState) => state.user);
-  useEffect(() => {
-    getRides();
-  }, []);
+
   return (
     <Block
       paddingBottom={400}
