@@ -86,6 +86,15 @@ export type DriverProfileScreenProps = CompositeScreenProps<
   BottomTabScreenProps<RootBottomTabParamsDriver, 'Profile'>,
   NativeStackScreenProps<DriverStackParamList>
 >;
+
+// export type DriverEditProfileScreenProps = CompositeScreenProps<
+//   BottomTabScreenProps<RootBottomTabParamsDriver>,
+//   NativeStackScreenProps<DriverStackParamList, 'EditProfile'>
+// >;
+// export type UserEditProfileScreenProps = CompositeScreenProps<
+//   BottomTabScreenProps<RootBottomTabParams>,
+//   NativeStackScreenProps<UserStackParamList, 'EditProfile'>
+// >;
 export type DriverEditProfileScreenProps = NativeStackScreenProps<
   DriverStackParamList,
   'EditProfile'

@@ -1,29 +1,43 @@
-import {Alert, Dimensions, StyleSheet, Text, View} from 'react-native';
-import React, {useState, useEffect, useRef} from 'react';
-import {SearchRidesScreenNavigationProps} from '../../types/types';
-import MapView, {Marker, Polyline, Region} from 'react-native-maps';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import { Alert, Dimensions, StyleSheet, Text, View } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { SearchRidesScreenNavigationProps } from '../../types/types';
+import MapView, { Marker, Polyline, Region } from 'react-native-maps';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import CustomButton from '../../components/login-types/custom-button';
 import axios from 'axios';
 import Geolocation from '@react-native-community/geolocation';
 import database from '@react-native-firebase/database';
-import {useSelector} from 'react-redux';
-import {StoreState} from '../../redux/reduxStore';
-import {Timestamp} from '@react-native-firebase/firestore';
+import { useSelector } from 'react-redux';
+import { StoreState } from '../../redux/reduxStore';
+import { Timestamp } from '@react-native-firebase/firestore';
+import { getRides } from '../../services/firebase-realtime/rides-services';
+import { decodePolyline } from '../../utils/map-functions';
 
-const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 const GOOGLE_MAPS_APIKEY = 'AIzaSyCMj4kAhPPoWAT32gMersFx7FkvMEW3560'; // Replace with your API key
+export type LatLangProps = {
+  latitude: number;
+  longitude: number;
+};
+
 
 const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
-  const [pickupLocation, setPickupLocation] = useState<any>(null);
-  const [dropoffLocation, setDropoffLocation] = useState<any>(null);
+  const [pickupLocation, setPickupLocation] = useState<LatLangProps | null>(
+    null,
+  );
+  const [dropoffLocation, setDropoffLocation] = useState<LatLangProps | null>(
+    null,
+  );
   const [routeCoords, setRouteCoords] = useState<any[]>([]);
   const [distance, setDistance] = useState<string>('');
+  const [driverLocation, setDriverLocation] = useState<LatLangProps | null>(
+    null,
+  );
   const [locationStage, setLocationStage] = useState<
     'pickup' | 'dropoff' | 'none'
   >('pickup');
@@ -32,8 +46,8 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
   const currentPosition = () => {
     Geolocation.getCurrentPosition(
       position => {
-        const {latitude, longitude} = position.coords;
-        setPickupLocation({latitude, longitude});
+        const { latitude, longitude } = position.coords;
+        setPickupLocation({ latitude, longitude });
         mapRef.current?.animateToRegion(
           {
             latitude: position.coords.latitude,
@@ -58,8 +72,8 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
   useEffect(() => {
     Geolocation.getCurrentPosition(
       position => {
-        const {latitude, longitude} = position.coords;
-        setPickupLocation({latitude, longitude});
+        const { latitude, longitude } = position.coords;
+        setPickupLocation({ latitude, longitude });
         mapRef.current?.animateToRegion(
           {
             latitude: position.coords.latitude,
@@ -82,9 +96,12 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
     // Request user's location when component mounts
   }, []);
 
-  const calculateRoute = async () => {
-    if (pickupLocation && dropoffLocation) {
-      const directionsUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${pickupLocation.latitude},${pickupLocation.longitude}&destination=${dropoffLocation.latitude},${dropoffLocation.longitude}&mode=driving&key=${GOOGLE_MAPS_APIKEY}`;
+  const calculateRoute = async (
+    pickup: LatLangProps,
+    dropoff: LatLangProps,
+  ) => {
+    if (pickup && dropoff) {
+      const directionsUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${pickup.latitude},${pickup.longitude}&destination=${dropoff.latitude},${dropoff.longitude}&mode=driving&key=${GOOGLE_MAPS_APIKEY}`;
 
       try {
         const response = await axios.get(directionsUrl);
@@ -96,7 +113,7 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
         // Get the distance from the API response
         const routeDistance = response.data.routes[0].legs[0].distance.text;
         setDistance(routeDistance);
-        mapRef.current?.fitToCoordinates([pickupLocation, dropoffLocation], {
+        mapRef.current?.fitToCoordinates([pickup, dropoff], {
           edgePadding: {
             top: 50,
             right: 50,
@@ -112,54 +129,16 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
     }
   };
 
-  const decodePolyline = (t: any) => {
-    let points = [];
-    let index = 0,
-      len = t.length;
-    let lat = 0,
-      lng = 0;
-
-    while (index < len) {
-      let b,
-        shift = 0,
-        result = 0;
-      do {
-        b = t.charCodeAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      let dlat = result & 1 ? ~(result >> 1) : result >> 1;
-      lat += dlat;
-
-      shift = 0;
-      result = 0;
-      do {
-        b = t.charCodeAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      let dlng = result & 1 ? ~(result >> 1) : result >> 1;
-      lng += dlng;
-
-      points.push({
-        latitude: lat / 1e5,
-        longitude: lng / 1e5,
-      });
-    }
-    return points;
-  };
-
   const handleMapPress = (event: any) => {
-    const {latitude, longitude} = event.nativeEvent.coordinate;
+    const { latitude, longitude } = event.nativeEvent.coordinate;
     if (locationStage === 'pickup') {
-      setPickupLocation({latitude, longitude});
+      setPickupLocation({ latitude, longitude });
       setLocationStage('dropoff');
     } else if (locationStage === 'dropoff') {
-      setDropoffLocation({latitude, longitude});
+      setDropoffLocation({ latitude, longitude });
     }
   };
   const findRides = () => {
-    console.log(userData.uid, 'uid');
     database()
       .ref('/drive-time/rides/' + userData.uid)
       .set({
@@ -169,6 +148,7 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
         dateTime: Timestamp.now(),
         price: Number(distance.slice(0, -2)) * 20,
         status: 'Offer',
+        uid: userData.uid,
       })
       .then(() => console.log('Data set.'));
   };
@@ -195,6 +175,24 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
       });
     }
   }, [pickupLocation, dropoffLocation]);
+
+  useEffect(() => {
+    if (userData?.uid) {
+      database()
+        .ref('/drive-time/rides/' + userData.uid)
+        .on('value', snapshot => {
+          if (snapshot?.val()?.uid) {
+            setDropoffLocation(snapshot.val().dropoffLocation);
+            setPickupLocation(snapshot.val().pickupLocation);
+            setLocationStage('none');
+            calculateRoute(
+              snapshot.val().pickupLocation,
+              snapshot.val().dropoffLocation,
+            );
+          }
+        });
+    }
+  }, []);
   return (
     <View style={styles.container}>
       {/* MapView */}
@@ -239,7 +237,7 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
           placeholder="Pickup Location"
           fetchDetails={true}
           onPress={(data, details = null) => {
-            const {lat, lng}: any = details?.geometry?.location;
+            const { lat, lng }: any = details?.geometry?.location;
             setPickupLocation({
               latitude: lat,
               longitude: lng,
@@ -263,7 +261,7 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
           placeholder="Dropoff Location"
           fetchDetails={true}
           onPress={(data, details = null) => {
-            const {lat, lng}: any = details?.geometry?.location;
+            const { lat, lng }: any = details?.geometry?.location;
             setDropoffLocation({
               latitude: lat,
               longitude: lng,
@@ -274,7 +272,7 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
             language: 'en',
           }}
           styles={{
-            container: [styles.searchContainer, {top: 100}],
+            container: [styles.searchContainer],
             textInput: styles.searchInput,
           }}
         />
@@ -284,7 +282,7 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
       {pickupLocation && dropoffLocation && locationStage !== 'none' && (
         <CustomButton
           text="Confirm Locations"
-          handlePress={calculateRoute}
+          handlePress={() => calculateRoute(pickupLocation, dropoffLocation)}
           contanierStyles={styles.confirmLocation}
         />
       )}
@@ -350,7 +348,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
     elevation: 5,

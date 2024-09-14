@@ -14,6 +14,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import ProfileModal from '../../components/common/profile-image-modal';
 import { uploadImage } from '../../services/storage-service/StorageService';
 import { useUser } from '../../hooks/useUser';
+import { useAuth } from '../../hooks/useAuth';
 
 interface HelpBoxProps {
     text: string;

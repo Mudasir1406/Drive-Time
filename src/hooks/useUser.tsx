@@ -35,6 +35,7 @@ export const useUser = () => {
       );
       return true;
     } catch (error) {
+      console.log(error, 'error');
       toast.update(toastId, 'Profile Update Failed. Please Try Again.', {
         type: 'danger',
       });

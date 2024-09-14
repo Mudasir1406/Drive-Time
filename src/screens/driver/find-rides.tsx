@@ -14,6 +14,7 @@ import { requestCameraPermission } from '../../utils/camera-permission';
 import { colors } from '../../constant';
 import { requestLocationPermission } from '../../utils/camera-permission';
 import Geolocation from '@react-native-community/geolocation';
+import database from '@react-native-firebase/database';
 import {
     getRides,
     updateAndPushData,
@@ -25,6 +26,8 @@ import { MyObjectType } from '../../types/types';
 import { useSelector } from 'react-redux';
 import { StoreState } from '../../redux/reduxStore';
 import axios from 'axios';
+import { LatLangProps } from '../user/search-rides';
+import { decodePolyline } from '../../utils/map-functions';
 
 const GOOGLE_MAPS_APIKEY = 'AIzaSyCMj4kAhPPoWAT32gMersFx7FkvMEW3560';
 const FindRides = () => {
@@ -39,6 +42,21 @@ const FindRides = () => {
     const [selectedOffer, setselectedOffer] = useState<MyObjectType>();
     const [routeCoords, setRouteCoords] = useState<any[]>([]);
 
+    const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+        const toRad = (value: number) => (value * Math.PI) / 180;
+        const R = 6371000; // Radius of the Earth in meters
+
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; // Distance in meters
+    };
+
     const getCurrentLocation = () => {
         Geolocation.getCurrentPosition(
             position => {
@@ -48,16 +66,15 @@ const FindRides = () => {
                 setCurrentLat(latitude);
                 setCurrentLong(longitude);
 
-                // Check if the position has changed
-                if (
-                    selectedOffer &&
-                    prevPositionRef.current &&
-                    (prevPositionRef.current.latitude !== latitude ||
-                        prevPositionRef.current.longitude !== longitude)
-                ) {
-                    updateDriverLocation(selectedOffer?.uid, latitude, longitude);
-                }
+                if (selectedOffer && prevPositionRef.current) {
+                    const prevLat = prevPositionRef.current.latitude;
+                    const prevLong = prevPositionRef.current.longitude;
+                    const distance = calculateDistance(prevLat, prevLong, latitude, longitude);
 
+                    if (distance > 5) {
+                        updateDriverLocation(selectedOffer.uid, latitude, longitude);
+                    }
+                }
                 // Update the map view
                 mapRef.current?.animateToRegion(
                     {
@@ -82,13 +99,7 @@ const FindRides = () => {
             },
         );
     };
-    const getFIlterRides = () => {
-        getRides().then(data => {
-            console.log(data, '(data?.filteredRides');
 
-            setOffers(data?.filteredRides);
-        });
-    }
     const handleOfferAccept = (doc: MyObjectType) => {
         setselectedOffer(doc);
         updateAndPushData(
@@ -99,80 +110,43 @@ const FindRides = () => {
             currentLat,
             currentLong,
         ).then(data => {
-            console.log(data, 'update data');
-            calculateRoute();
-            getFIlterRides()
+            calculateRoute({ latitude: currentLat, longitude: currentLong }, doc.pickupLocation);
+            setOffers([])
         });
     };
 
-    const calculateRoute = async () => {
-        console.log(selectedOffer, 'selectedOffer');
-
-        if (selectedOffer) {
-            const directionsUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${currentLat},${currentLong}&destination=${selectedOffer?.pickupLocation?.latitude},${selectedOffer?.pickupLocation?.longitude}&mode=driving&key=${GOOGLE_MAPS_APIKEY}`;
-            try {
-                const response = await axios.get(directionsUrl);
-                const points = decodePolyline(
-                    response.data.routes[0].overview_polyline.points,
-                );
-                setRouteCoords(points);
-                mapRef.current?.fitToCoordinates(
-                    [
-                        selectedOffer.pickupLocation,
-                        { latitude: currentLat, longitude: currentLong },
-                    ],
-                    {
-                        edgePadding: {
-                            top: 50,
-                            right: 50,
-                            bottom: 50,
-                            left: 50,
-                        },
-                        animated: true,
+    const calculateRoute = async (
+        pickup: LatLangProps,
+        dropoff: LatLangProps,
+    ) => {
+        const directionsUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${pickup.latitude},${pickup.longitude}&destination=${dropoff.latitude},${dropoff.longitude}&mode=driving&key=${GOOGLE_MAPS_APIKEY}`;
+        try {
+            const response = await axios.get(directionsUrl);
+            const points = decodePolyline(
+                response.data.routes[0].overview_polyline.points,
+            );
+            setRouteCoords(points);
+            mapRef.current?.fitToCoordinates(
+                [
+                    pickup,
+                    dropoff,
+                ],
+                {
+                    edgePadding: {
+                        top: 50,
+                        right: 50,
+                        bottom: 50,
+                        left: 50,
                     },
-                );
-            } catch (error) {
-                console.error('Error fetching directions: ', error);
-            }
+                    animated: true,
+                },
+            );
+        } catch (error) {
+            console.error('Error fetching directions: ', error);
         }
     };
 
-    const decodePolyline = (t: any) => {
-        let points = [];
-        let index = 0,
-            len = t.length;
-        let lat = 0,
-            lng = 0;
 
-        while (index < len) {
-            let b,
-                shift = 0,
-                result = 0;
-            do {
-                b = t.charCodeAt(index++) - 63;
-                result |= (b & 0x1f) << shift;
-                shift += 5;
-            } while (b >= 0x20);
-            let dlat = result & 1 ? ~(result >> 1) : result >> 1;
-            lat += dlat;
-
-            shift = 0;
-            result = 0;
-            do {
-                b = t.charCodeAt(index++) - 63;
-                result |= (b & 0x1f) << shift;
-                shift += 5;
-            } while (b >= 0x20);
-            let dlng = result & 1 ? ~(result >> 1) : result >> 1;
-            lng += dlng;
-
-            points.push({
-                latitude: lat / 1e5,
-                longitude: lng / 1e5,
-            });
-        }
-        return points;
-    };
 
     useEffect(() => {
         const intervalId = setInterval(() => {
@@ -183,12 +157,28 @@ const FindRides = () => {
     }, []);
 
     useEffect(() => {
-        getFIlterRides()
-    }, []);
-    useEffect(() => {
-        console.log(offers, 'offers');
+        if (!selectedOffer)
+            database()
+                .ref('/drive-time/rides')
+                .on(
+                    'value',
+                    snapshot => {
+                        const allRides = snapshot.val();
 
-    }, [offers]);
+                        if (allRides) {
+                            const filteredRides = Object.keys(allRides)
+                                .map(key => allRides[key])
+                                .filter(ride => ride.status === 'Offer');
+                            setOffers(filteredRides)
+                        } else {
+                            console.log('No rides found.');
+                        }
+                    },
+                    error => {
+                    },
+                );
+    }, []);
+
 
 
     return (
