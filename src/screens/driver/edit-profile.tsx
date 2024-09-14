@@ -1,8 +1,8 @@
-import {Pressable, StyleSheet, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {DriverEditProfileScreenProps} from '../../types/types';
-import {useSelector} from 'react-redux';
-import {StoreState} from '../../redux/reduxStore';
+import { Pressable, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { DriverEditProfileScreenProps } from '../../types/types';
+import { useSelector } from 'react-redux';
+import { StoreState } from '../../redux/reduxStore';
 import LogoSection from '../../components/common/logo-section';
 import {
   Box,
@@ -20,22 +20,22 @@ import {
   SelectTrigger,
 } from '@gluestack-ui/themed';
 import CustomButton from '../../components/login-types/custom-button';
-import {HStack} from '@gluestack-ui/themed';
-import {Text} from '@gluestack-ui/themed';
-import {colors} from '../../constant';
-import {useUser} from '../../hooks/useUser';
+import { HStack } from '@gluestack-ui/themed';
+import { Text } from '@gluestack-ui/themed';
+import { colors } from '../../constant';
+import { useUser } from '../../hooks/useUser';
 import Input from '../../components/common/input';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import CameraModal from '../../components/common/camera-modal';
-import {requestCameraPermission} from '../../utils/camera-permission';
+import { requestCameraPermission } from '../../utils/camera-permission';
 import ImagePicker from 'react-native-image-crop-picker';
-import {Toast} from 'react-native-toast-notifications';
-import {uploadImage} from '../../services/storage-service/StorageService';
+import { Toast } from 'react-native-toast-notifications';
+import { uploadImage } from '../../services/storage-service/StorageService';
 
 type UserField = 'vehicleImages' | 'vehicleDocuments' | 'license';
 
-const EditProfile: React.FC<DriverEditProfileScreenProps> = ({navigation}) => {
-  const {updateUserProfile} = useUser();
+const EditProfile: React.FC<DriverEditProfileScreenProps> = ({ navigation }) => {
+  const { updateUserProfile } = useUser();
 
   const [modalVisible, setModalVisible] = useState(false);
   const userData = useSelector((state: StoreState) => state.user);
@@ -43,11 +43,11 @@ const EditProfile: React.FC<DriverEditProfileScreenProps> = ({navigation}) => {
   const [selectedImageCatgeory, setselectedImageCatgeory] = useState('');
 
   const handleChange = (field: string) => (text: string) => {
-    setvalues(prev => ({...prev, [field]: text}));
+    setvalues(prev => ({ ...prev, [field]: text }));
   };
 
   const handleGenderChange = (itemValue: string, feild: string) => {
-    setvalues(prev => ({...prev, [feild]: itemValue}));
+    setvalues(prev => ({ ...prev, [feild]: itemValue }));
   };
 
   const openCamera = async () => {
@@ -126,7 +126,7 @@ const EditProfile: React.FC<DriverEditProfileScreenProps> = ({navigation}) => {
   return (
     <ScrollView>
       <Box sx={styles.main}>
-        <Center sx={{marginBottom: 30}}>
+        <Center sx={{ marginBottom: 30 }}>
           <LogoSection />
         </Center>
 
@@ -267,7 +267,7 @@ const EditProfile: React.FC<DriverEditProfileScreenProps> = ({navigation}) => {
                       name="cancel"
                       style={styles.cancel}
                     />
-                    <Image alt="ops" sx={styles.img} source={{uri: data}} />
+                    <Image alt="ops" sx={styles.img} source={{ uri: data }} />
                   </Box>
                 );
               })}
@@ -289,7 +289,7 @@ const EditProfile: React.FC<DriverEditProfileScreenProps> = ({navigation}) => {
                   }}>
                   <MaterialIcons
                     name="add-a-photo"
-                    style={{color: colors.white, fontSize: 30}}
+                    style={{ color: colors.white, fontSize: 30 }}
                   />
                 </Pressable>
               )}
@@ -308,7 +308,7 @@ const EditProfile: React.FC<DriverEditProfileScreenProps> = ({navigation}) => {
                       name="cancel"
                       style={styles.cancel}
                     />
-                    <Image alt="ops" sx={styles.img} source={{uri: data}} />
+                    <Image alt="ops" sx={styles.img} source={{ uri: data }} />
                   </Box>
                 );
               })}
@@ -329,7 +329,7 @@ const EditProfile: React.FC<DriverEditProfileScreenProps> = ({navigation}) => {
                 }}>
                 <MaterialIcons
                   name="add-a-photo"
-                  style={{color: colors.white, fontSize: 30}}
+                  style={{ color: colors.white, fontSize: 30 }}
                 />
               </Pressable>
             )}
@@ -348,7 +348,7 @@ const EditProfile: React.FC<DriverEditProfileScreenProps> = ({navigation}) => {
                       name="cancel"
                       style={styles.cancel}
                     />
-                    <Image alt="ops" sx={styles.img} source={{uri: data}} />
+                    <Image alt="ops" sx={styles.img} source={{ uri: data }} />
                   </Box>
                 );
               })}
@@ -369,7 +369,7 @@ const EditProfile: React.FC<DriverEditProfileScreenProps> = ({navigation}) => {
                 }}>
                 <MaterialIcons
                   name="add-a-photo"
-                  style={{color: colors.white, fontSize: 30}}
+                  style={{ color: colors.white, fontSize: 30 }}
                 />
               </Pressable>
             )}

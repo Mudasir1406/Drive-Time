@@ -1,45 +1,77 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { colors, images } from '../../constant'
 import { Box, Image } from '@gluestack-ui/themed'
-import { useSelector } from 'react-redux'
-import { StoreState } from '../../redux/reduxStore'
 import Foundation from "react-native-vector-icons/Foundation"
 import Entypo from "react-native-vector-icons/Entypo"
+import { MyObjectType } from '../../types/types'
+import { getLocationName } from '../../utils/location-address'
+import { useAuth } from '../../hooks/useAuth'
 
+type Iprops = {
+    data: MyObjectType;
+    handleOfferAccept: () => void;
+}
 
-const OfferCard = () => {
-    const userData = useSelector((state: StoreState) => state.user);
+type CustomerInfo = {
+    dob: string;
+    firstname: string;
+    gender: string;
+    lastname: string;
+    phone: string;
+    userType: string;
+    username: string;
+    email: string;
+    profile: string;
+};
+
+const OfferCard: React.FC<Iprops> = ({ data, handleOfferAccept }) => {
+    const { getUserById } = useAuth()
+    const [pickupAddress, setPickupAddress] = useState('')
+    const [dropOffAddress, setDropOffAddress] = useState('')
+    const [customerInfo, setcustomerInfo] = useState<CustomerInfo | null>(null);
+    useEffect(() => {
+        getLocationName(data?.pickupLocation.latitude, data?.pickupLocation.longitude).then((data) => {
+            setPickupAddress(data)
+        })
+        getLocationName(data?.dropoffLocation.latitude, data?.dropoffLocation.longitude).then((data) => {
+            setDropOffAddress(data)
+        })
+        getUserById(data?.uid).then((data) => {
+            if (data) {
+                setcustomerInfo(data as CustomerInfo)
+            }
+        })
+    }, [data])
     return (
         <View style={styles.offerMain} >
             <View style={styles.absollute} >
                 <View style={styles.top} >
                     <Image source={{
-                        uri: userData && userData?.profile ? userData?.profile : images.logo
+                        uri: customerInfo && customerInfo?.profile?.length > 0 ? customerInfo?.profile : images.carPro
                     }} style={{
                         width: 60,
                         height: 60,
                         borderRadius: 30
                     }} alt='oops' />
-                    <View>
+                    <View style={{ width: "80%" }} >
 
-                        <Text style={styles.name} >User Name</Text>
-                        <Text style={[styles.name, { fontSize: 14, opacity: 0.8 }]} >Pick up : King Street #01</Text>
-                        <Text style={[styles.name, { fontSize: 14, opacity: 0.8 }]} >Destination : King Street #01</Text>
+                        <Text style={styles.name} >{customerInfo && customerInfo?.firstname && customerInfo?.lastname ? `${customerInfo?.firstname} ${customerInfo?.lastname}` : "ANONYMOUS"}</Text>
+                        <Text style={[styles.name, { fontSize: 13, opacity: 0.8, flexWrap: "wrap" }]} ><Text style={{ fontSize: 14, fontWeight: "700" }} >Pick up </Text>: {pickupAddress}</Text>
+                        <Text style={[styles.name, { fontSize: 13, opacity: 0.8, flexWrap: "wrap" }]} ><Text style={{ fontSize: 14, fontWeight: "700" }} >Destination</Text> : {dropOffAddress}</Text>
                     </View>
                 </View>
                 <View style={styles.bottom} >
                     <View style={styles.dollar} >
                         <Foundation name='dollar' style={{ color: colors.white, fontSize: 40 }} />
-                        <Text style={[styles.name, { fontSize: 33, fontWeight: "700" }]} >100</Text>
+                        <Text style={[styles.name, { fontSize: 33, fontWeight: "700" }]} >{data?.price}</Text>
                     </View>
                     <View style={[styles.dollar, { gap: 15 }]} >
-                        <Box sx={{ alignItems: "center", justifyContent: "center", width: 50, height: 50, borderRadius: 25, borderWidth: 1, borderColor: "green" }} >
+                        <Pressable onPress={handleOfferAccept} style={{ alignItems: "center", justifyContent: "center", width: 50, height: 50, borderRadius: 25, borderWidth: 1, borderColor: "green" }} >
 
                             <Entypo name='check' style={{ color: "green", fontSize: 30 }} />
-                        </Box>
+                        </Pressable>
                         <Box sx={{ alignItems: "center", justifyContent: "center", width: 50, height: 50, borderRadius: 25, borderWidth: 1, borderColor: "red" }} >
-
                             <Entypo name='cross' style={{ color: "red", fontSize: 30 }} />
                         </Box>
                     </View>
