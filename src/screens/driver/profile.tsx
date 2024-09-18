@@ -31,6 +31,7 @@ const HelpBox: React.FC<HelpBoxProps> = ({text, icon}) => {
 };
 
 const Profile: React.FC<DriverProfileScreenProps> = ({navigation}) => {
+  const {logOut} = useAuth();
   const userData = useSelector((state: StoreState) => state.user);
   console.log(userData, 'userDa');
   const {updateUserProfile} = useUser();
@@ -152,7 +153,7 @@ const Profile: React.FC<DriverProfileScreenProps> = ({navigation}) => {
             About Us
           </Text>
         </Box>
-        <Box style={styles.infoPages}>
+        <Pressable style={styles.infoPages} onPress={() => logOut()}>
           <MaterialIcons
             name="logout"
             style={{color: colors.black, fontSize: 25}}
@@ -160,7 +161,7 @@ const Profile: React.FC<DriverProfileScreenProps> = ({navigation}) => {
           <Text style={{color: colors.black, fontSize: 19, fontWeight: '600'}}>
             Logout
           </Text>
-        </Box>
+        </Pressable>
         <ProfileModal
           setModalVisible={setModalVisible}
           modalVisible={modalVisible}

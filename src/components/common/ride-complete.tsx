@@ -7,8 +7,9 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 type IProps = {
   fare: number | undefined;
+  handleSubmitOk: () => void;
 };
-const RideComplete: React.FC<IProps> = ({fare}) => {
+const RideComplete: React.FC<IProps> = ({fare, handleSubmitOk}) => {
   return (
     <View style={styles.main}>
       <Box
@@ -49,6 +50,7 @@ const RideComplete: React.FC<IProps> = ({fare}) => {
           alignItems: 'center',
         }}>
         <Button
+          onPress={handleSubmitOk}
           sx={{
             width: '30%',
             marginTop: 10,
