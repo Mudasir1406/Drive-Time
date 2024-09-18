@@ -14,6 +14,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import ProfileModal from '../../components/common/profile-image-modal';
 import {uploadImage} from '../../services/storage-service/StorageService';
 import {useUser} from '../../hooks/useUser';
+import {useAuth} from '../../hooks/useAuth';
 
 interface HelpBoxProps {
   text: string;
@@ -31,6 +32,7 @@ const HelpBox: React.FC<HelpBoxProps> = ({text, icon}) => {
 
 const Profile: React.FC<DriverProfileScreenProps> = ({navigation}) => {
   const userData = useSelector((state: StoreState) => state.user);
+  const {logOut} = useAuth();
   console.log(userData, 'userDa');
   const {updateUserProfile} = useUser();
   const [modalVisible, setModalVisible] = useState(false);
@@ -151,7 +153,7 @@ const Profile: React.FC<DriverProfileScreenProps> = ({navigation}) => {
             About Us
           </Text>
         </Box>
-        <Box style={styles.infoPages}>
+        <Pressable style={styles.infoPages} onPress={() => logOut()}>
           <MaterialIcons
             name="logout"
             style={{color: colors.black, fontSize: 25}}
@@ -159,7 +161,7 @@ const Profile: React.FC<DriverProfileScreenProps> = ({navigation}) => {
           <Text style={{color: colors.black, fontSize: 19, fontWeight: '600'}}>
             Logout
           </Text>
-        </Box>
+        </Pressable>
         <ProfileModal
           setModalVisible={setModalVisible}
           modalVisible={modalVisible}

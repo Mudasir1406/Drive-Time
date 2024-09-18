@@ -1,7 +1,7 @@
 export const decodePolyline = (t: any) => {
   let points = [];
   let index = 0,
-    len = t.length;
+    len = t?.length;
   let lat = 0,
     lng = 0;
 

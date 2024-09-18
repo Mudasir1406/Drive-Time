@@ -28,12 +28,15 @@ import {StoreState} from '../../redux/reduxStore';
 import axios from 'axios';
 import {LatLangProps} from '../user/search-rides';
 import {decodePolyline} from '../../utils/map-functions';
+import RideComplete from '../../components/common/ride-complete';
 
 const GOOGLE_MAPS_APIKEY = 'AIzaSyCMj4kAhPPoWAT32gMersFx7FkvMEW3560';
 const FindRides = () => {
   const [currentLong, setCurrentLong] = useState(0);
   const [currentLat, setCurrentLat] = useState(0);
   const [offers, setOffers] = useState<MyObjectType[]>();
+  const [isArrived, setIsArrived] = useState<Boolean>(false);
+  const [isRideComplete, setIsRideComplete] = useState<Boolean>(false);
   const mapRef = useRef<MapView | null>(null);
   const userData = useSelector((state: StoreState) => state.user);
   const prevPositionRef = useRef<{latitude: number; longitude: number} | null>(
@@ -69,24 +72,61 @@ const FindRides = () => {
       position => {
         const {latitude, longitude} = position.coords;
 
-        // Update state
         setCurrentLat(latitude);
         setCurrentLong(longitude);
 
         if (selectedOffer && prevPositionRef.current) {
           const prevLat = prevPositionRef.current.latitude;
           const prevLong = prevPositionRef.current.longitude;
-          const distance = calculateDistance(
-            prevLat,
-            prevLong,
-            latitude,
-            longitude,
-          );
 
-          if (distance > 5) {
+          if (calculateDistance(prevLat, prevLong, latitude, longitude) > 5) {
             updateDriverLocation(selectedOffer.uid, latitude, longitude);
           }
+          // pickup_Location Status Check
+          const pickUpDistance = calculateDistance(
+            latitude,
+            longitude,
+            selectedOffer.pickupLocation.latitude,
+            selectedOffer.pickupLocation.longitude,
+          );
+          if (pickUpDistance <= 50) {
+            updateAndPushData(
+              selectedOffer.uid,
+              'Driver_Arrived',
+              selectedOffer,
+              userData,
+              latitude,
+              longitude,
+            );
+            console.log('Driver has arrived at the pickup location');
+            setIsArrived(true);
+            calculateRoute(
+              selectedOffer.pickupLocation,
+              selectedOffer.dropoffLocation,
+            );
+          }
+
+          // dropOff_Location Status Check
+          const dropOffDistance = calculateDistance(
+            latitude,
+            longitude,
+            selectedOffer?.dropoffLocation?.latitude,
+            selectedOffer?.dropoffLocation?.longitude,
+          );
+          if (dropOffDistance <= 50) {
+            updateAndPushData(
+              selectedOffer.uid,
+              'Ride_Completed',
+              selectedOffer,
+              userData,
+              latitude,
+              longitude,
+            );
+            setIsRideComplete(true);
+            console.log('Ride Completed');
+          }
         }
+
         // Update the map view
         mapRef.current?.animateToRegion(
           {
@@ -138,10 +178,10 @@ const FindRides = () => {
     try {
       const response = await axios.get(directionsUrl);
       const points = decodePolyline(
-        response.data.routes[0].overview_polyline.points,
+        response?.data.routes[0]?.overview_polyline.points,
       );
       setRouteCoords(points);
-      mapRef.current?.fitToCoordinates([pickup, dropoff], {
+      mapRef?.current?.fitToCoordinates([pickup, dropoff], {
         edgePadding: {
           top: 50,
           right: 50,
@@ -202,14 +242,27 @@ const FindRides = () => {
         zoomControlEnabled>
         {selectedOffer?.pickupLocation?.latitude &&
           selectedOffer?.pickupLocation?.longitude && (
-            <Marker
-              coordinate={{
-                latitude: selectedOffer?.pickupLocation?.latitude,
-                longitude: selectedOffer?.pickupLocation?.longitude,
-              }}
-            />
+            <>
+              <Marker
+                coordinate={{
+                  latitude: currentLat,
+
+                  longitude: currentLong,
+                }}
+              />
+              <Marker
+                coordinate={{
+                  latitude: isArrived
+                    ? selectedOffer?.dropoffLocation?.latitude
+                    : selectedOffer?.pickupLocation?.latitude,
+                  longitude: isArrived
+                    ? selectedOffer?.dropoffLocation?.longitude
+                    : selectedOffer?.pickupLocation?.longitude,
+                }}
+              />
+            </>
           )}
-        {routeCoords.length > 0 && (
+        {routeCoords?.length > 0 && (
           <Polyline
             coordinates={routeCoords}
             strokeWidth={6}
@@ -219,9 +272,10 @@ const FindRides = () => {
           />
         )}
       </MapView>
+
       {offers &&
         offers?.length > 0 &&
-        offers.map((data, index) => {
+        offers?.map((data, index) => {
           return (
             <OfferCard
               key={index}
@@ -232,6 +286,7 @@ const FindRides = () => {
             />
           );
         })}
+      {isRideComplete && <RideComplete fare={selectedOffer?.price} />}
     </View>
   );
 };
