@@ -12,6 +12,15 @@ import {StoreState} from '../../redux/reduxStore';
 import {Timestamp} from '@react-native-firebase/firestore';
 import {getRides} from '../../services/firebase-realtime/rides-services';
 import {decodePolyline} from '../../utils/map-functions';
+import DriverFound from '../../components/common/driver-found';
+import {UserSliceType} from '../../redux/user/slice';
+import PaymentModal from '../../components/common/payment-modal';
+import {
+  StripeProvider,
+  useConfirmPayment,
+  useStripe,
+} from '@stripe/stripe-react-native';
+import DriverArrived from '../../components/common/driver-arrived';
 
 const {width, height} = Dimensions.get('window');
 
@@ -25,7 +34,9 @@ export type LatLangProps = {
   longitude: number;
 };
 
-const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
+const SearchRides: React.FC<SearchRidesScreenNavigationProps> = ({
+  navigation,
+}) => {
   const [pickupLocation, setPickupLocation] = useState<LatLangProps | null>(
     null,
   );
@@ -34,15 +45,78 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
   );
   const [routeCoords, setRouteCoords] = useState<any[]>([]);
   const [distance, setDistance] = useState<string>('');
+  const [amount, setAmount] = useState<number>(0);
   const [driverLocation, setDriverLocation] = useState<LatLangProps | null>(
     null,
   );
+  const [driverInfo, setDriverInfo] = useState<UserSliceType>();
   const [finding, setFinding] = useState<boolean>(false);
+  const [isArrived, setIsArrived] = useState<boolean>(false);
+  const [showPayment, setShowPayment] = useState<boolean>(false);
+  const [showDriverInfo, setShowDriverInfo] = useState<boolean>(false);
+  const {confirmPayment} = useConfirmPayment();
+  const [clientSecret, setClientSecret] = useState('');
   const [locationStage, setLocationStage] = useState<
     'pickup' | 'dropoff' | 'none'
   >('pickup');
+  const {initPaymentSheet, presentPaymentSheet} = useStripe();
+  const [loading, setLoading] = useState(false);
+
+  const initializePaymentSheet = async () => {
+    const clientSecret = await fetchPaymentIntentClientSecret();
+
+    const {error} = await initPaymentSheet({
+      paymentIntentClientSecret: clientSecret,
+      merchantDisplayName: 'Your Merchant Name',
+      style: 'automatic', // Can be 'automatic' or 'manual'
+      allowsDelayedPaymentMethods: true, // For future off-session payments
+    });
+
+    if (!error) {
+      setLoading(true); // Enable the payment button
+    }
+  };
   const userData = useSelector((state: StoreState) => state.user);
   const mapRef = useRef<MapView>(null);
+  const fetchPaymentIntentClientSecret = async () => {
+    const response = await axios.post(
+      'https://grandviewgetaway.com:3000/drive-time/create-payment-intent',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: amount, // Amount in the smallest currency unit (e.g., cents for USD)
+          currency: 'usd', // The currency code
+        }),
+      },
+    );
+    const {clientSecret} = await response.data;
+    return clientSecret;
+  };
+  const openPaymentSheet = async () => {
+    Alert.alert('Success', 'Your payment was confirmed successfully!', [
+      {
+        text: 'Ok',
+        onPress: () => navigation.navigate('BottomTab', {screen: 'Home'}),
+      },
+    ]);
+    // await initializePaymentSheet();
+    // const {error} = await presentPaymentSheet();
+
+    // if (error) {
+    //   Alert.alert(`Error: ${error.message}`);
+    // } else {
+    //   Alert.alert('Success', 'Your payment was confirmed successfully!', [
+    //     {
+    //       text: 'Ok',
+    //       onPress: () => navigation.navigate('BottomTab', {screen: 'Home'}),
+    //     },
+    //   ]);
+    // }
+  };
+  useEffect(() => {}, []);
   const currentPosition = () => {
     Geolocation.getCurrentPosition(
       position => {
@@ -106,7 +180,7 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
       try {
         const response = await axios.get(directionsUrl);
         const points = decodePolyline(
-          response.data.routes[0].overview_polyline.points,
+          response.data?.routes[0]?.overview_polyline?.points,
         );
         setRouteCoords(points);
 
@@ -185,18 +259,54 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
           if (snapshot?.val()?.uid) {
             setDropoffLocation(snapshot.val().dropoffLocation);
             setPickupLocation(snapshot.val().pickupLocation);
-            setLocationStage('none');
+
+            if (
+              snapshot.val().dropoffLocation &&
+              snapshot.val().pickupLocation
+            ) {
+              setLocationStage('none');
+            }
             calculateRoute(
               snapshot.val().pickupLocation,
               snapshot.val().dropoffLocation,
             );
-            if (snapshot.val().status === 'Offer_accepted') {
+
+            if (snapshot.val().status === 'Driver_Arrived') {
+              setIsArrived(true);
             }
-            if (snapshot.val().driverInfo)
+            if (snapshot.val()?.driverInfo) {
+              if (snapshot.val().status === 'Offer_accepted') {
+                setShowDriverInfo(true);
+                mapRef.current?.fitToCoordinates(
+                  [
+                    snapshot.val().pickupLocation,
+                    {
+                      latitude: snapshot.val().driverInfo.currentLat,
+                      longitude: snapshot.val().driverInfo.currentLong,
+                    },
+                  ],
+                  {
+                    edgePadding: {
+                      top: 50,
+                      right: 50,
+                      bottom: 50,
+                      left: 50,
+                    },
+                    animated: true,
+                  },
+                );
+              }
+              setDriverInfo(snapshot.val()?.driverInfo);
+              console.log(snapshot.val()?.driverInfo);
               setDriverLocation({
-                latitude: snapshot.val().driverInfo.currentLat,
-                longitude: snapshot.val().driverInfo.currentLong,
+                latitude: snapshot.val()?.driverInfo?.currentLat,
+                longitude: snapshot.val()?.driverInfo?.currentLong,
               });
+            }
+            if (snapshot.val().status === 'Ride_Completed') {
+              setAmount(snapshot.val().price);
+              setShowPayment(true);
+            }
           }
         });
     }
@@ -306,7 +416,7 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
       )}
       {finding && (
         <CustomButton
-          text="Finding Ride..."
+          text={driverInfo ? "Driver is on it's way." : 'Finding Ride...'}
           handlePress={() => {}}
           contanierStyles={styles.confirmLocation}
         />
@@ -318,7 +428,20 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
           contanierStyles={styles.confirmLocation}
         />
       )}
-
+      {driverInfo && showDriverInfo && (
+        <DriverFound
+          driverInfo={driverInfo}
+          onPressOk={() => setShowDriverInfo(false)}
+        />
+      )}
+      {isArrived && <DriverArrived onPressOk={() => setIsArrived(false)} />}
+      <StripeProvider publishableKey="pk_test_51P2FrVRxtMIfYHGVrveT5sJAln9upSl8ghZN4LYmZztIqVsYJeH0iYoGm3V6A9ayNUDfsfAmjK2TAM0OZa1s1g5200mfSyW94V">
+        {showPayment ? (
+          <PaymentModal onPressOk={openPaymentSheet} amount={amount} />
+        ) : (
+          <></>
+        )}
+      </StripeProvider>
       {/* Distance Display */}
       <View style={styles.distanceContainer}>
         {distance ? (
