@@ -6,6 +6,7 @@ import {
 } from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {StackNavigationProp} from '@react-navigation/stack';
+import {UserSliceType} from '../redux/user/slice';
 
 export type AuthStackParamList = {
   Login: undefined;
@@ -107,6 +108,7 @@ export type MyObjectType = {
   price: number;
   status: string;
   uid: string;
+  driverInfo?: UserSliceType;
   dropoffLocation: {
     latitude: number;
     longitude: number;

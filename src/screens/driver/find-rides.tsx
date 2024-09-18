@@ -29,9 +29,11 @@ import axios from 'axios';
 import {LatLangProps} from '../user/search-rides';
 import {decodePolyline} from '../../utils/map-functions';
 import RideComplete from '../../components/common/ride-complete';
+import {useUser} from '../../hooks/useUser';
 
 const GOOGLE_MAPS_APIKEY = 'AIzaSyCMj4kAhPPoWAT32gMersFx7FkvMEW3560';
 const FindRides = () => {
+  const {updateRide} = useUser();
   const [currentLong, setCurrentLong] = useState(0);
   const [currentLat, setCurrentLat] = useState(0);
   const [offers, setOffers] = useState<MyObjectType[]>();
@@ -44,7 +46,11 @@ const FindRides = () => {
   );
   const [selectedOffer, setselectedOffer] = useState<MyObjectType>();
   const [routeCoords, setRouteCoords] = useState<any[]>([]);
-
+  const handleSubmitOk = () => {
+    if (selectedOffer) {
+      updateRide({...selectedOffer, driverInfo: userData});
+    }
+  };
   const calculateDistance = (
     lat1: number,
     lon1: number,
@@ -204,26 +210,54 @@ const FindRides = () => {
   }, []);
 
   useEffect(() => {
-    if (!selectedOffer)
-      database()
-        .ref('/drive-time/rides')
-        .on(
-          'value',
-          snapshot => {
-            const allRides = snapshot.val();
+    if (!selectedOffer) {
+      const rideRef = database().ref('/drive-time/rides');
 
-            if (allRides) {
-              const filteredRides = Object.keys(allRides)
-                .map(key => allRides[key])
-                .filter(ride => ride.status === 'Offer');
-              setOffers(filteredRides);
-            } else {
-              console.log('No rides found.');
+      const handleDataChange = (snapshot: {val: () => any}) => {
+        const allRides = snapshot.val();
+
+        if (allRides) {
+          const filteredRides = Object.keys(allRides)
+            .map(key => allRides[key])
+            .filter(
+              ride =>
+                ride.status === 'Offer' ||
+                ride.status === 'Driver_Arrived' ||
+                ride.status === 'Ride_Completed',
+            );
+
+          setOffers(filteredRides);
+
+          // Handle Driver_Arrived status
+          filteredRides.forEach(ride => {
+            if (ride.status === 'Driver_Arrived') {
+              setCurrentLat(ride.pickupLocation.latitude);
+              setCurrentLong(ride.pickupLocation.longitude);
+              setIsArrived(true);
+              console.log('Driver has arrived at the pickup location');
             }
-          },
-          error => {},
-        );
-  }, []);
+
+            // Handle Ride_Completed status
+            if (ride.status === 'Ride_Completed') {
+              setIsRideComplete(true);
+              console.log('Ride Completed');
+            }
+          });
+        } else {
+          console.log('No rides found.');
+        }
+      };
+
+      rideRef.on('value', handleDataChange, error => {
+        console.log(error);
+      });
+
+      // Cleanup listener on component unmount
+      return () => {
+        rideRef.off('value', handleDataChange);
+      };
+    }
+  }, [selectedOffer]);
 
   return (
     <View style={{position: 'relative'}}>
@@ -286,7 +320,12 @@ const FindRides = () => {
             />
           );
         })}
-      {isRideComplete && <RideComplete fare={selectedOffer?.price} />}
+      {isRideComplete && (
+        <RideComplete
+          fare={selectedOffer?.price}
+          handleSubmitOk={handleSubmitOk}
+        />
+      )}
     </View>
   );
 };
