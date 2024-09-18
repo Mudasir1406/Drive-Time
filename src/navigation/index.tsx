@@ -21,7 +21,7 @@ const AppContanier = () => {
   const dispatch = useDispatch<StoreDispatch>();
   const userData = useSelector((state: StoreState) => state.user);
 
-  const [loading, setLoading] = useState(true); // Manage loading state
+  const [loading, setLoading] = useState(false); // Manage loading state
 
   const getPermissions = async () => {
     const isLocation = await requestLocationPermission();
