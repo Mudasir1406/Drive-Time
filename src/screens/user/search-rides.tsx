@@ -1,19 +1,19 @@
-import { Alert, Dimensions, StyleSheet, Text, View } from 'react-native';
-import React, { useState, useEffect, useRef } from 'react';
-import { SearchRidesScreenNavigationProps } from '../../types/types';
-import MapView, { Marker, Polyline, Region } from 'react-native-maps';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import {Alert, Dimensions, StyleSheet, Text, View} from 'react-native';
+import React, {useState, useEffect, useRef} from 'react';
+import {SearchRidesScreenNavigationProps} from '../../types/types';
+import MapView, {Marker, Polyline, Region} from 'react-native-maps';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import CustomButton from '../../components/login-types/custom-button';
 import axios from 'axios';
 import Geolocation from '@react-native-community/geolocation';
 import database from '@react-native-firebase/database';
-import { useSelector } from 'react-redux';
-import { StoreState } from '../../redux/reduxStore';
-import { Timestamp } from '@react-native-firebase/firestore';
-import { getRides } from '../../services/firebase-realtime/rides-services';
-import { decodePolyline } from '../../utils/map-functions';
+import {useSelector} from 'react-redux';
+import {StoreState} from '../../redux/reduxStore';
+import {Timestamp} from '@react-native-firebase/firestore';
+import {getRides} from '../../services/firebase-realtime/rides-services';
+import {decodePolyline} from '../../utils/map-functions';
 
-const { width, height } = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
@@ -24,7 +24,6 @@ export type LatLangProps = {
   latitude: number;
   longitude: number;
 };
-
 
 const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
   const [pickupLocation, setPickupLocation] = useState<LatLangProps | null>(
@@ -38,6 +37,7 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
   const [driverLocation, setDriverLocation] = useState<LatLangProps | null>(
     null,
   );
+  const [finding, setFinding] = useState<boolean>(false);
   const [locationStage, setLocationStage] = useState<
     'pickup' | 'dropoff' | 'none'
   >('pickup');
@@ -46,8 +46,8 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
   const currentPosition = () => {
     Geolocation.getCurrentPosition(
       position => {
-        const { latitude, longitude } = position.coords;
-        setPickupLocation({ latitude, longitude });
+        const {latitude, longitude} = position.coords;
+        setPickupLocation({latitude, longitude});
         mapRef.current?.animateToRegion(
           {
             latitude: position.coords.latitude,
@@ -72,8 +72,8 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
   useEffect(() => {
     Geolocation.getCurrentPosition(
       position => {
-        const { latitude, longitude } = position.coords;
-        setPickupLocation({ latitude, longitude });
+        const {latitude, longitude} = position.coords;
+        // setPickupLocation({ latitude, longitude });
         mapRef.current?.animateToRegion(
           {
             latitude: position.coords.latitude,
@@ -130,15 +130,16 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
   };
 
   const handleMapPress = (event: any) => {
-    const { latitude, longitude } = event.nativeEvent.coordinate;
+    const {latitude, longitude} = event.nativeEvent.coordinate;
     if (locationStage === 'pickup') {
-      setPickupLocation({ latitude, longitude });
+      setPickupLocation({latitude, longitude});
       setLocationStage('dropoff');
     } else if (locationStage === 'dropoff') {
-      setDropoffLocation({ latitude, longitude });
+      setDropoffLocation({latitude, longitude});
     }
   };
   const findRides = () => {
+    setFinding(true);
     database()
       .ref('/drive-time/rides/' + userData.uid)
       .set({
@@ -189,6 +190,13 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
               snapshot.val().pickupLocation,
               snapshot.val().dropoffLocation,
             );
+            if (snapshot.val().status === 'Offer_accepted') {
+            }
+            if (snapshot.val().driverInfo)
+              setDriverLocation({
+                latitude: snapshot.val().driverInfo.currentLat,
+                longitude: snapshot.val().driverInfo.currentLong,
+              });
           }
         });
     }
@@ -218,6 +226,9 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
         {dropoffLocation && (
           <Marker coordinate={dropoffLocation} title="Dropoff Location" />
         )}
+        {driverLocation && (
+          <Marker coordinate={driverLocation} title="Driver Location" />
+        )}
 
         {/* Polyline showing the route */}
         {routeCoords.length > 0 && (
@@ -237,7 +248,7 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
           placeholder="Pickup Location"
           fetchDetails={true}
           onPress={(data, details = null) => {
-            const { lat, lng }: any = details?.geometry?.location;
+            const {lat, lng}: any = details?.geometry?.location;
             setPickupLocation({
               latitude: lat,
               longitude: lng,
@@ -261,7 +272,7 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
           placeholder="Dropoff Location"
           fetchDetails={true}
           onPress={(data, details = null) => {
-            const { lat, lng }: any = details?.geometry?.location;
+            const {lat, lng}: any = details?.geometry?.location;
             setDropoffLocation({
               latitude: lat,
               longitude: lng,
@@ -286,10 +297,17 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = () => {
           contanierStyles={styles.confirmLocation}
         />
       )}
-      {locationStage === 'none' && (
+      {locationStage === 'none' && !finding && (
         <CustomButton
           text="Find Ride"
           handlePress={findRides}
+          contanierStyles={styles.confirmLocation}
+        />
+      )}
+      {finding && (
+        <CustomButton
+          text="Finding Ride..."
+          handlePress={() => {}}
           contanierStyles={styles.confirmLocation}
         />
       )}
@@ -348,7 +366,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 2,
     elevation: 5,

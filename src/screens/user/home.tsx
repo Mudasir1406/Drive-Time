@@ -23,17 +23,21 @@ const Home: React.FC<HomeScreenProps> = ({navigation}) => {
       <Text style={styles.heading}>Hi, {userData.firstname} Where to?</Text>
       <HStack justifyContent="space-between" marginTop={20}>
         <RideBox
-          image={images.carPro}
-          tag="Ride with Pro"
+          image={images.moterBike}
           onPress={() => navigation.navigate('SearchRides')}
           background={'#FFD700'}></RideBox>
         <RideBox
           image={images.car}
+          onPress={() => navigation.navigate('SearchRides')}
           tag="Recommanded"
           background={'#4CAF50'}></RideBox>
       </HStack>
       <HStack justifyContent="space-between" marginTop={20}>
-        <RideBox image={images.rideHistory}></RideBox>
+        <RideBox
+          image={images.carPro}
+          tag="Ride with Pro"
+          onPress={() => navigation.navigate('SearchRides')}
+          background={'#FFD700'}></RideBox>
 
         <RideBox image={images.star}></RideBox>
       </HStack>
