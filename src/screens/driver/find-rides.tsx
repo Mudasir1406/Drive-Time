@@ -44,11 +44,25 @@ const FindRides = () => {
   const prevPositionRef = useRef<{latitude: number; longitude: number} | null>(
     null,
   );
-  const [selectedOffer, setselectedOffer] = useState<MyObjectType>();
+  const [selectedOffer, setselectedOffer] = useState<MyObjectType | null>(null);
   const [routeCoords, setRouteCoords] = useState<any[]>([]);
   const handleSubmitOk = () => {
     if (selectedOffer) {
       updateRide({...selectedOffer, driverInfo: userData});
+
+      database()
+        .ref(`/drive-time/rides/${selectedOffer.uid}`)
+        .remove()
+        .then(() => {
+          console.log('Ride successfully removed from database.');
+        })
+        .catch(error => {
+          console.error('Error removing ride:', error);
+        });
+
+      // Reset state
+      setselectedOffer(null);
+      setIsRideComplete(false);
     }
   };
   const calculateDistance = (
@@ -152,8 +166,8 @@ const FindRides = () => {
       },
       {
         enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 10000,
+        timeout: 30000,
+        maximumAge: 20000,
       },
     );
   };
@@ -211,53 +225,60 @@ const FindRides = () => {
 
   useEffect(() => {
     if (!selectedOffer) {
-      const rideRef = database().ref('/drive-time/rides');
+      database()
+        .ref('/drive-time/rides')
+        .on(
+          'value',
+          snapshot => {
+            const allRides = snapshot.val();
+
+            if (allRides) {
+              const filteredRides = Object.keys(allRides)
+                .map(key => allRides[key])
+                .filter(ride => ride.status === 'Offer');
+              setOffers(filteredRides);
+            } else {
+              console.log('No rides found.');
+            }
+          },
+          error => {},
+        );
+    } else {
+      const rideRef = database().ref(`/drive-time/rides/${selectedOffer.uid}`);
 
       const handleDataChange = (snapshot: {val: () => any}) => {
-        const allRides = snapshot.val();
+        const rideData = snapshot.val();
 
-        if (allRides) {
-          const filteredRides = Object.keys(allRides)
-            .map(key => allRides[key])
-            .filter(
-              ride =>
-                ride.status === 'Offer' ||
-                ride.status === 'Driver_Arrived' ||
-                ride.status === 'Ride_Completed',
+        if (rideData) {
+          // Directly check the status of this single ride document
+          if (rideData.status === 'Driver_Arrived') {
+            setCurrentLat(rideData.pickupLocation.latitude);
+            setCurrentLong(rideData.pickupLocation.longitude);
+            setIsArrived(true);
+            calculateRoute(
+              selectedOffer?.pickupLocation,
+              selectedOffer?.dropoffLocation,
             );
+            console.log('Driver has arrived at the pickup location');
+          }
 
-          setOffers(filteredRides);
-
-          // Handle Driver_Arrived status
-          filteredRides.forEach(ride => {
-            if (ride.status === 'Driver_Arrived') {
-              setCurrentLat(ride.pickupLocation.latitude);
-              setCurrentLong(ride.pickupLocation.longitude);
-              setIsArrived(true);
-              console.log('Driver has arrived at the pickup location');
-            }
-
-            // Handle Ride_Completed status
-            if (ride.status === 'Ride_Completed') {
-              setIsRideComplete(true);
-              console.log('Ride Completed');
-            }
-          });
+          if (rideData.status === 'Ride_Completed') {
+            setIsRideComplete(true);
+            console.log('Ride Completed');
+          }
         } else {
-          console.log('No rides found.');
+          console.log('Ride not found.');
         }
       };
 
       rideRef.on('value', handleDataChange, error => {
         console.log(error);
       });
-
-      // Cleanup listener on component unmount
       return () => {
         rideRef.off('value', handleDataChange);
       };
     }
-  }, [selectedOffer]);
+  }, [selectedOffer]); // Added selectedOffer to dependencies to re-run the effect when it changes
 
   return (
     <View style={{position: 'relative'}}>
