@@ -79,42 +79,41 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = ({
   const userData = useSelector((state: StoreState) => state.user);
   const mapRef = useRef<MapView>(null);
   const fetchPaymentIntentClientSecret = async () => {
-    const response = await axios.post(
-      'https://grandviewgetaway.com:3000/drive-time/create-payment-intent',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          amount: amount, // Amount in the smallest currency unit (e.g., cents for USD)
-          currency: 'usd', // The currency code
-        }),
+    const data = JSON.stringify({
+      amount: amount,
+      currency: 'usd',
+    });
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: 'https://srive-time-server.vercel.app/drive-time/create-payment-intent',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    );
-    const {clientSecret} = await response.data;
+      data: data,
+    };
+    const response = await axios.request(config);
+    const {clientSecret} = response.data;
     return clientSecret;
   };
   const openPaymentSheet = async () => {
-    Alert.alert('Success', 'Your payment was confirmed successfully!', [
-      {
-        text: 'Ok',
-        onPress: () => navigation.navigate('BottomTab', {screen: 'Home'}),
-      },
-    ]);
-    // await initializePaymentSheet();
-    // const {error} = await presentPaymentSheet();
+    try {
+      await initializePaymentSheet();
+      const {error} = await presentPaymentSheet();
 
-    // if (error) {
-    //   Alert.alert(`Error: ${error.message}`);
-    // } else {
-    //   Alert.alert('Success', 'Your payment was confirmed successfully!', [
-    //     {
-    //       text: 'Ok',
-    //       onPress: () => navigation.navigate('BottomTab', {screen: 'Home'}),
-    //     },
-    //   ]);
-    // }
+      if (error) {
+        Alert.alert(`Error: ${error.message}`);
+      } else {
+        Alert.alert('Success', 'Your payment was confirmed successfully!', [
+          {
+            text: 'Ok',
+            onPress: () => navigation.navigate('BottomTab', {screen: 'Home'}),
+          },
+        ]);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
   useEffect(() => {}, []);
   const currentPosition = () => {
@@ -297,7 +296,6 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = ({
                 );
               }
               setDriverInfo(snapshot.val()?.driverInfo);
-              console.log(snapshot.val()?.driverInfo);
               setDriverLocation({
                 latitude: snapshot.val()?.driverInfo?.currentLat,
                 longitude: snapshot.val()?.driverInfo?.currentLong,
@@ -445,12 +443,14 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = ({
       {/* Distance Display */}
       <View style={styles.distanceContainer}>
         {distance ? (
-          <Text>
+          <Text style={{color: 'black'}}>
             Distance: {distance} Estimated Price: $
             {Number(distance.slice(0, -2)) * 20}
           </Text>
         ) : (
-          <Text>Select locations to calculate route</Text>
+          <Text style={{color: 'black'}}>
+            Select locations to calculate route
+          </Text>
         )}
       </View>
     </View>
@@ -479,6 +479,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderWidth: 1,
     paddingLeft: 10,
+    color: 'black',
   },
   distanceContainer: {
     position: 'absolute',

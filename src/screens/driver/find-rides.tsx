@@ -118,15 +118,12 @@ const FindRides = () => {
               latitude,
               longitude,
             );
-            console.log('Driver has arrived at the pickup location');
             setIsArrived(true);
             calculateRoute(
               selectedOffer.pickupLocation,
               selectedOffer.dropoffLocation,
             );
           }
-
-          // dropOff_Location Status Check
           const dropOffDistance = calculateDistance(
             latitude,
             longitude,
@@ -218,7 +215,7 @@ const FindRides = () => {
   useEffect(() => {
     const intervalId = setInterval(() => {
       getCurrentLocation();
-    }, 5000);
+    }, 30 * 1000);
 
     return () => clearInterval(intervalId);
   }, []);
