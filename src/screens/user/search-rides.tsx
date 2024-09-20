@@ -79,10 +79,10 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = ({
   const userData = useSelector((state: StoreState) => state.user);
   const mapRef = useRef<MapView>(null);
   const fetchPaymentIntentClientSecret = async () => {
-    const data = JSON.stringify({
-      amount: amount,
+    const data = {
+      amount: 100,
       currency: 'usd',
-    });
+    };
     let config = {
       method: 'post',
       maxBodyLength: Infinity,
@@ -93,6 +93,7 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = ({
       data: data,
     };
     const response = await axios.request(config);
+    console.log(response);
     const {clientSecret} = response.data;
     return clientSecret;
   };
