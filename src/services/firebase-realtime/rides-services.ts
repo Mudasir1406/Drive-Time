@@ -36,9 +36,10 @@ export const getRides = (): Promise<GetRidesResult> => {
 
 interface UpdateAndPushResult {
   updated: boolean;
+  data: MyObjectType;
 }
 
-export const updateAndPushData = (
+export const updateAndPushData = async (
   userID: string,
   status: string,
   doc: MyObjectType,
@@ -46,7 +47,7 @@ export const updateAndPushData = (
   currentLat: number,
   currentLong: number,
 ): Promise<UpdateAndPushResult> => {
-  return new Promise((resolve, reject) => {
+  try {
     const rideRef = database().ref(`/drive-time/rides/${userID}`);
 
     // Create the update payload
@@ -55,39 +56,40 @@ export const updateAndPushData = (
     };
 
     // Update the data first
-    rideRef
-      .update(updates)
-      .then(() => {
-        console.log('Data updated successfully.');
+    await rideRef.update(updates);
+    console.log('Data updated successfully.');
 
-        // Now push additional data to the same reference
-        const newData = {
-          driverInfo: {
-            ...driverInfo,
-            currentLat: currentLat,
-            currentLong: currentLong,
-          },
-        };
+    // Now push additional data to the same reference
+    const newData = {
+      driverInfo: {
+        ...driverInfo,
+        currentLat: currentLat,
+        currentLong: currentLong,
+      },
+    };
 
-        return rideRef.update(newData).then(() => {
-          resolve({updated: true});
-        });
-      })
-      .catch(error => {
-        console.error('Error updating or pushing data:', error);
-        reject(error);
-      });
-  });
+    await rideRef.update(newData);
+
+    // Fetch the updated data
+    const snapshot = await rideRef.once('value');
+    const updatedData = snapshot.val();
+
+    return {updated: true, data: updatedData};
+  } catch (error) {
+    console.error('Error updating or pushing data:', error);
+    throw error; // Reject the promise with the error
+  }
 };
 interface UpdateLatLongResult {
   updated: boolean;
+  data: MyObjectType;
 }
-export const updateDriverLocation = (
+export const updateDriverLocation = async (
   userID: string,
   currentLat: number,
   currentLong: number,
 ): Promise<UpdateLatLongResult> => {
-  return new Promise((resolve, reject) => {
+  try {
     const rideRef = database().ref(`/drive-time/rides/${userID}/driverInfo`);
 
     // Create the update payload for latitude and longitude
@@ -97,15 +99,17 @@ export const updateDriverLocation = (
     };
 
     // Update the latitude and longitude inside driverInfo
-    rideRef
-      .update(updates)
-      .then(() => {
-        console.log('Driver location updated successfully.');
-        resolve({updated: true});
-      })
-      .catch(error => {
-        console.error('Error updating driver location:', error);
-        reject(error);
-      });
-  });
+    await rideRef.update(updates);
+    console.log('Driver location updated successfully.');
+
+    // Fetch the updated document
+    const rideDocRef = database().ref(`/drive-time/rides/${userID}`);
+    const snapshot = await rideDocRef.once('value');
+    const updatedDoc = snapshot.val();
+
+    return {updated: true, data: updatedDoc}; // Return the updated document
+  } catch (error) {
+    console.error('Error updating driver location:', error);
+    throw error; // Reject the promise with the error
+  }
 };
