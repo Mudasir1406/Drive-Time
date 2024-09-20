@@ -140,7 +140,6 @@ const FindRides = () => {
               latitude,
               longitude,
             );
-            console.log('Driver has arrived at the pickup location');
             setIsArrived(true);
 
             // Calculate route for pickup and dropoff locations
