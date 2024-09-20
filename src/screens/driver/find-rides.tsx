@@ -34,6 +34,7 @@ import {useUser} from '../../hooks/useUser';
 const GOOGLE_MAPS_APIKEY = 'AIzaSyCMj4kAhPPoWAT32gMersFx7FkvMEW3560';
 const FindRides = () => {
   const {updateRide} = useUser();
+
   const [currentLong, setCurrentLong] = useState(0);
   const [currentLat, setCurrentLat] = useState(0);
   const [offers, setOffers] = useState<MyObjectType[]>();
@@ -41,10 +42,11 @@ const FindRides = () => {
   const [isRideComplete, setIsRideComplete] = useState<Boolean>(false);
   const mapRef = useRef<MapView | null>(null);
   const userData = useSelector((state: StoreState) => state.user);
-  const prevPositionRef = useRef<{latitude: number; longitude: number} | null>(
+
+  const [selectedOffer, setselectedOffer] = useState<MyObjectType | null>();
+  const [mySelectedOffer, setMySelectedOffer] = useState<MyObjectType | null>(
     null,
   );
-  const [selectedOffer, setselectedOffer] = useState<MyObjectType | null>(null);
   const [routeCoords, setRouteCoords] = useState<any[]>([]);
   const handleSubmitOk = () => {
     if (selectedOffer) {
@@ -87,29 +89,49 @@ const FindRides = () => {
     return R * c; // Distance in meters
   };
 
-  const getCurrentLocation = () => {
+  const getCurrentLocation = async () => {
     Geolocation.getCurrentPosition(
-      position => {
+      async position => {
         const {latitude, longitude} = position.coords;
 
+        // Update current latitude and longitude state
         setCurrentLat(latitude);
         setCurrentLong(longitude);
 
-        if (selectedOffer && prevPositionRef.current) {
-          const prevLat = prevPositionRef.current.latitude;
-          const prevLong = prevPositionRef.current.longitude;
-
-          if (calculateDistance(prevLat, prevLong, latitude, longitude) > 5) {
-            updateDriverLocation(selectedOffer.uid, latitude, longitude);
+        console.log(selectedOffer, 'selectedOffer');
+        if (selectedOffer) {
+          // Calculate driver's distance from last known location
+          const driverLat = selectedOffer?.driverInfo?.currentLat || 0;
+          const driverLong = selectedOffer?.driverInfo?.currentLong || 0;
+          console.log(
+            calculateDistance(driverLat, driverLong, latitude, longitude),
+            'distt',
+          );
+          if (
+            calculateDistance(driverLat, driverLong, latitude, longitude) > 5
+          ) {
+            const resp = await updateDriverLocation(
+              selectedOffer.uid,
+              latitude,
+              longitude,
+            );
+            console.log(resp.data, 'daa');
+            setselectedOffer({
+              ...selectedOffer,
+              driverInfo: resp.data.driverInfo,
+            });
           }
-          // pickup_Location Status Check
+
+          // Check the distance to the pickup location
           const pickUpDistance = calculateDistance(
             latitude,
             longitude,
-            selectedOffer.pickupLocation.latitude,
-            selectedOffer.pickupLocation.longitude,
+            selectedOffer?.pickupLocation?.latitude,
+            selectedOffer?.pickupLocation?.longitude,
           );
+
           if (pickUpDistance <= 50) {
+            // Mark as Driver Arrived at pickup
             updateAndPushData(
               selectedOffer.uid,
               'Driver_Arrived',
@@ -120,20 +142,24 @@ const FindRides = () => {
             );
             console.log('Driver has arrived at the pickup location');
             setIsArrived(true);
+
+            // Calculate route for pickup and dropoff locations
             calculateRoute(
               selectedOffer.pickupLocation,
               selectedOffer.dropoffLocation,
             );
           }
 
-          // dropOff_Location Status Check
+          // Check the distance to the dropoff location
           const dropOffDistance = calculateDistance(
             latitude,
             longitude,
             selectedOffer?.dropoffLocation?.latitude,
             selectedOffer?.dropoffLocation?.longitude,
           );
+
           if (dropOffDistance <= 50) {
+            // Mark ride as completed
             updateAndPushData(
               selectedOffer.uid,
               'Ride_Completed',
@@ -147,7 +173,7 @@ const FindRides = () => {
           }
         }
 
-        // Update the map view
+        // Update map view with the new location
         mapRef.current?.animateToRegion(
           {
             latitude,
@@ -155,11 +181,10 @@ const FindRides = () => {
             longitudeDelta: 0.05,
             latitudeDelta: 0.05,
           },
-          500,
+          500, // Duration for animation in milliseconds
         );
 
-        // Update the previous position ref
-        prevPositionRef.current = {latitude, longitude};
+        // Store the current position as the previous one for future comparison
       },
       error => {
         console.log(error);
@@ -173,7 +198,6 @@ const FindRides = () => {
   };
 
   const handleOfferAccept = (doc: MyObjectType) => {
-    setselectedOffer(doc);
     updateAndPushData(
       doc?.uid,
       'Offer_accepted',
@@ -181,7 +205,9 @@ const FindRides = () => {
       userData,
       currentLat,
       currentLong,
-    ).then(data => {
+    ).then(resp => {
+      console.log(resp.data, 'daata');
+      setselectedOffer(resp.data);
       calculateRoute(
         {latitude: currentLat, longitude: currentLong},
         doc.pickupLocation,
@@ -218,12 +244,17 @@ const FindRides = () => {
   useEffect(() => {
     const intervalId = setInterval(() => {
       getCurrentLocation();
-    }, 5000);
+    }, 10000);
 
     return () => clearInterval(intervalId);
   }, []);
-
   useEffect(() => {
+    if (selectedOffer) {
+      getCurrentLocation();
+    }
+  }, [selectedOffer]);
+  useEffect(() => {
+    // Fetch ride data from the database
     if (!selectedOffer) {
       database()
         .ref('/drive-time/rides')
@@ -233,17 +264,52 @@ const FindRides = () => {
             const allRides = snapshot.val();
 
             if (allRides) {
-              const filteredRides = Object.keys(allRides)
-                .map(key => allRides[key])
-                .filter(ride => ride.status === 'Offer');
-              setOffers(filteredRides);
+              // Get the user's current location using Geolocation
+              Geolocation.getCurrentPosition(
+                position => {
+                  const {latitude, longitude} = position.coords;
+
+                  // Filter rides based on the user's current location
+                  const filteredRides = Object.keys(allRides)
+                    .map(key => allRides[key])
+                    .filter(ride => {
+                      const distanceInMeters = calculateDistance(
+                        latitude, // Use current latitude
+                        longitude, // Use current longitude
+                        ride.pickupLocation.latitude,
+                        ride.pickupLocation.longitude,
+                      );
+
+                      const distanceInKm = distanceInMeters / 1000;
+
+                      return ride.status === 'Offer' && distanceInKm <= 2;
+                    });
+
+                  // Update the offers state with the filtered rides
+                  if (filteredRides.length > 0) setOffers(filteredRides);
+                  console.log(filteredRides, 'filteredRides');
+                },
+                error => {
+                  console.error('Error getting current position:', error);
+                },
+                {
+                  enableHighAccuracy: true,
+                  timeout: 30000,
+                  maximumAge: 20000,
+                },
+              );
             } else {
               console.log('No rides found.');
             }
           },
-          error => {},
+          error => {
+            console.error('Error fetching rides:', error);
+          },
         );
-    } else {
+    }
+  }, []);
+  useEffect(() => {
+    if (selectedOffer) {
       const rideRef = database().ref(`/drive-time/rides/${selectedOffer.uid}`);
 
       const handleDataChange = (snapshot: {val: () => any}) => {
@@ -278,7 +344,7 @@ const FindRides = () => {
         rideRef.off('value', handleDataChange);
       };
     }
-  }, [selectedOffer]); // Added selectedOffer to dependencies to re-run the effect when it changes
+  }, [selectedOffer]);
 
   return (
     <View style={{position: 'relative'}}>

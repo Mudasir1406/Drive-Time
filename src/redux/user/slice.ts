@@ -27,6 +27,8 @@ export type UserSliceType = {
   license?: string[];
   profile?: string;
   password?: string;
+  currentLat?: number;
+  currentLong?: number;
 };
 
 export const userSliceIntialState: UserSliceType = {
