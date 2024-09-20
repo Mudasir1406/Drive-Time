@@ -8,6 +8,7 @@ import {BannerCarousel, RideBox} from '../../components';
 import {HStack} from '@gluestack-ui/themed';
 import {images} from '../../constant';
 import {getRides} from '../../services/firebase-realtime/rides-services';
+import Earnings from '../../components/common/Earnings';
 
 const DriverHome: React.FC<HomeScreenProps> = ({navigation}) => {
   const userData = useSelector((state: StoreState) => state.user);
@@ -23,7 +24,9 @@ const DriverHome: React.FC<HomeScreenProps> = ({navigation}) => {
       <Text style={styles.heading}>
         Hi, {userData.firstname} Ready to Drive?
       </Text>
-      <HStack justifyContent="space-between" marginTop={20}></HStack>
+      <HStack justifyContent="space-between" marginTop={20}>
+        <Earnings />
+      </HStack>
     </Block>
   );
 };

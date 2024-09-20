@@ -30,6 +30,8 @@ import {LatLangProps} from '../user/search-rides';
 import {decodePolyline} from '../../utils/map-functions';
 import RideComplete from '../../components/common/ride-complete';
 import {useUser} from '../../hooks/useUser';
+import {Box} from '@gluestack-ui/themed';
+import CustomButton from '../../components/login-types/custom-button';
 
 const GOOGLE_MAPS_APIKEY = 'AIzaSyCMj4kAhPPoWAT32gMersFx7FkvMEW3560';
 const FindRides = () => {
@@ -40,10 +42,13 @@ const FindRides = () => {
   const [offers, setOffers] = useState<MyObjectType[]>();
   const [isArrived, setIsArrived] = useState<Boolean>(false);
   const [isRideComplete, setIsRideComplete] = useState<Boolean>(false);
+  const [isStartRide, setIsStartRide] = useState<Boolean>(false);
+  const [isOfferAccept, setIsOfferAccept] = useState<Boolean>(false);
   const mapRef = useRef<MapView | null>(null);
   const userData = useSelector((state: StoreState) => state.user);
 
   const [selectedOffer, setselectedOffer] = useState<MyObjectType | null>();
+
   const [mySelectedOffer, setMySelectedOffer] = useState<MyObjectType | null>(
     null,
   );
@@ -65,6 +70,7 @@ const FindRides = () => {
       // Reset state
       setselectedOffer(null);
       setIsRideComplete(false);
+      setIsArrived(false);
     }
   };
   const calculateDistance = (
@@ -214,7 +220,29 @@ const FindRides = () => {
       setOffers([]);
     });
   };
-
+  const handleStatusClick = async (status: string) => {
+    if (selectedOffer) {
+      if (status === 'driver') {
+        updateAndPushData(
+          selectedOffer.uid,
+          'Driver_Arrived',
+          selectedOffer,
+          userData,
+          currentLat,
+          currentLong,
+        );
+      } else {
+        updateAndPushData(
+          selectedOffer.uid,
+          'Ride_Completed',
+          selectedOffer,
+          userData,
+          currentLat,
+          currentLong,
+        );
+      }
+    }
+  };
   const calculateRoute = async (
     pickup: LatLangProps,
     dropoff: LatLangProps,
@@ -319,7 +347,8 @@ const FindRides = () => {
           if (rideData.status === 'Driver_Arrived') {
             setCurrentLat(rideData.pickupLocation.latitude);
             setCurrentLong(rideData.pickupLocation.longitude);
-            setIsArrived(true);
+
+            setIsOfferAccept(false);
             calculateRoute(
               selectedOffer?.pickupLocation,
               selectedOffer?.dropoffLocation,
@@ -328,8 +357,19 @@ const FindRides = () => {
           }
 
           if (rideData.status === 'Ride_Completed') {
+            setIsStartRide(false);
             setIsRideComplete(true);
             console.log('Ride Completed');
+          }
+          if (rideData.status === 'Ride_Started') {
+            setIsStartRide(true);
+
+            console.log('Ride Completed');
+          }
+
+          if (rideData.status === 'Offer_accepted') {
+            setIsOfferAccept(true);
+            console.log('Offer_accepted');
           }
         } else {
           console.log('Ride not found.');
@@ -392,7 +432,22 @@ const FindRides = () => {
           />
         )}
       </MapView>
-
+      <Box sx={styles.absoluteBox}>
+        <Box sx={{width: '80%'}}>
+          {isOfferAccept && (
+            <CustomButton
+              text={'Notify user that you are arrived'}
+              handlePress={() => handleStatusClick('driver')}
+            />
+          )}
+          {isStartRide && (
+            <CustomButton
+              text={'Click to ride complete'}
+              handlePress={() => handleStatusClick('ride')}
+            />
+          )}
+        </Box>
+      </Box>
       {offers &&
         offers?.length > 0 &&
         offers?.map((data, index) => {
@@ -417,3 +472,13 @@ const FindRides = () => {
 };
 
 export default FindRides;
+
+const styles = StyleSheet.create({
+  absoluteBox: {
+    position: 'absolute',
+    bottom: 120,
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
+  },
+});

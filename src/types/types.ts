@@ -53,6 +53,7 @@ export type RootBottomTabParamsDriver = {
   Home: undefined;
   Ride: undefined;
   Profile: undefined;
+  Earning: undefined;
 };
 
 export type UserStackParamList = {
