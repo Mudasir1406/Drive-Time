@@ -54,8 +54,7 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = ({
   const [isArrived, setIsArrived] = useState<boolean>(false);
   const [showPayment, setShowPayment] = useState<boolean>(false);
   const [showDriverInfo, setShowDriverInfo] = useState<boolean>(false);
-  const {confirmPayment} = useConfirmPayment();
-  const [clientSecret, setClientSecret] = useState('');
+  const [status, setStatus] = useState('');
   const [locationStage, setLocationStage] = useState<
     'pickup' | 'dropoff' | 'none'
   >('pickup');
@@ -80,7 +79,7 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = ({
   const mapRef = useRef<MapView>(null);
   const fetchPaymentIntentClientSecret = async () => {
     const data = {
-      amount: 100,
+      amount: amount * 100,
       currency: 'usd',
     };
     let config = {
@@ -202,6 +201,19 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = ({
       }
     }
   };
+  const handleStartRide = async () => {
+    const rideRef = database().ref(`/drive-time/rides/${userData.uid}`);
+
+    // Create the update payload
+    const updates = {
+      status: 'Ride_Started',
+    };
+    try {
+      await rideRef.update(updates);
+      setStatus('Ride_Started');
+    } catch (error) {}
+    // Update the data first
+  };
 
   const handleMapPress = (event: any) => {
     const {latitude, longitude} = event.nativeEvent.coordinate;
@@ -225,7 +237,10 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = ({
         status: 'Offer',
         uid: userData.uid,
       })
-      .then(() => console.log('Data set.'));
+      .then(() => {
+        console.log('Data set.');
+        setStatus('Offer');
+      });
   };
   useEffect(() => {
     if (pickupLocation && !dropoffLocation) {
@@ -273,9 +288,11 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = ({
 
             if (snapshot.val().status === 'Driver_Arrived') {
               setIsArrived(true);
+              setStatus('Driver_Arrived');
             }
             if (snapshot.val()?.driverInfo) {
               if (snapshot.val().status === 'Offer_accepted') {
+                setStatus('Offer_accepted');
                 setShowDriverInfo(true);
                 mapRef.current?.fitToCoordinates(
                   [
@@ -303,6 +320,7 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = ({
               });
             }
             if (snapshot.val().status === 'Ride_Completed') {
+              setStatus('Ride_Completed');
               setAmount(snapshot.val().price);
               setShowPayment(true);
             }
@@ -424,6 +442,13 @@ const SearchRides: React.FC<SearchRidesScreenNavigationProps> = ({
         <CustomButton
           text="Current Location"
           handlePress={currentPosition}
+          contanierStyles={styles.confirmLocation}
+        />
+      )}
+      {status === 'Driver_Arrived' && (
+        <CustomButton
+          text="Start Ride"
+          handlePress={handleStartRide}
           contanierStyles={styles.confirmLocation}
         />
       )}
