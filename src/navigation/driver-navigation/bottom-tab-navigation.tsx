@@ -4,11 +4,13 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {StyleSheet} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Profile from '../../screens/driver/profile';
 import {DriverRide, HomeDriver} from '../../screens';
 import CustomDriverHeader from '../../components/common/header-driver';
 import {colors} from '../../constant';
 import HeaderDriverOne from '../../components/common/header-driver-one';
+import EarningRides from '../../screens/driver/earning-rides';
 const Tab = createBottomTabNavigator<RootBottomTabParamsDriver>();
 const BottomTab = () => {
   return (
@@ -64,6 +66,18 @@ const BottomTab = () => {
         }}
         name="Profile"
         component={Profile}
+      />
+      <Tab.Screen
+        options={{
+          header: () => <HeaderDriverOne title={''} />,
+          tabBarLabelStyle: {marginBottom: 10},
+          tabBarLabel: 'Earnings',
+          tabBarIcon: ({color, size}) => (
+            <FontAwesome name="money" color={color} size={size} />
+          ),
+        }}
+        name="Earning"
+        component={EarningRides}
       />
     </Tab.Navigator>
   );
